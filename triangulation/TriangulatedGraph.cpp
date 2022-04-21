@@ -1,0 +1,163 @@
+//
+// Created by Peter Li on 4/12/22.
+//
+
+#include "TriangulatedGraph.h"
+
+TriangulatedGraph::TriangulatedGraph(size_t size) : size(size) {
+    this->size = size;
+    for (int i = 0; i < size; ++i) {
+        vertices.emplace_back(i);
+    }
+    for (int i = 0; i < size; ++i) {
+        addEdge(i, (i + 1) % size);
+    }
+}
+
+void TriangulatedGraph::addEdge(int a, int b) {
+    vertices[a].neighbors.insert(b);
+    vertices[b].neighbors.insert(a);
+}
+
+void getSharedNeighbors(const TriangulatedGraph *g, const Node *v1, const Node *v2, std::vector<int> &result) {
+    std::vector<int> neighbor1(g->getSize()), neighbor2(g->getSize());
+    for (int n: v1->neighbors) {
+        neighbor1[n] = 1;
+    }
+    for (int n: v2->neighbors) {
+        neighbor2[n] = 1;
+    }
+    for (int i = 0; i < g->getSize(); i++) {
+        if (neighbor1[i] == neighbor2[i] && neighbor1[i] == 1) {
+            result.push_back(i);
+        }
+    }
+}
+
+Edge TriangulatedGraph::flip(const int a, const int b) {
+    Node *v1 = &vertices[a], *v2 = &vertices[b];
+    std::vector<int> sharedNeighbors;
+    getSharedNeighbors(this, v1, v2, sharedNeighbors);
+    if (sharedNeighbors.size() != 2) {
+        return {-1, -1};
+    }
+    v1->removeEdge(a, b);
+    v2->removeEdge(a, b);
+    int n1 = sharedNeighbors[0], n2 = sharedNeighbors[1];
+    addEdge(n1, n2);
+    return {n1, n2};
+}
+
+// deprecated
+std::string triangulationGraphToTreeString(TriangulatedGraph &g) {
+    int size = g.getSize();
+    std::string arr[size];
+    for (Node &v: g.vertices) {
+        for (int neighbor: v.neighbors) {
+            int diff = abs(v.id - neighbor);
+            if (diff != 1 && diff != size - 1 && v.id < neighbor) {
+                arr[v.id] += "(";
+                arr[neighbor] = ")" + arr[neighbor];
+            }
+        }
+    }
+    std::string res;
+    for (auto &s: arr) {
+        res += s + 'a';
+    }
+    res.pop_back();
+    return res;
+}
+
+// deprecated
+std::string treeStringToParentheses(const std::string &s, size_t start = 0, size_t end = -1) {
+    if (end == -1) {
+        end = s.size();
+    }
+    if (start == s.size() || start >= end - 1) {
+        return "";
+    }
+    if (s[start] == 'a') {
+        return "()" + treeStringToParentheses(s, start + 1, end);
+    } else {
+        int counter = 1;
+        size_t index = start + 1;
+        while (counter > 0) {
+            if (s[index] == ')') {
+                counter--;
+            } else if (s[index] == '(') {
+                counter++;
+            }
+            index++;
+        }
+        index--;
+        if (index == end - 1) {
+            return treeStringToParentheses(s, start + 1, end - 1);
+        }
+        return "(" + treeStringToParentheses(s, start + 1, index) +
+               ")" + treeStringToParentheses(s, index + 1, end);
+    }
+}
+
+//std::string toStringRecursive(TriangulatedGraph &g, int start, int end) {
+//    
+//}
+
+BinaryString TriangulatedGraph::toBinaryString() {
+    // TODO: use more intuitive splitting approach
+    return BinaryString(treeStringToParentheses(triangulationGraphToTreeString(*this)));
+}
+
+size_t TriangulatedGraph::getSize() const {
+    return size;
+}
+
+bool TriangulatedGraph::isValid() {
+    size_t total = 0;
+    for (const Node& v: vertices) {
+        total += v.neighbors.size();
+    }
+    return total / 2 == size * 2 - 3;
+}
+
+bool TriangulatedGraph::operator==(const TriangulatedGraph &g) const {
+    if (size != g.getSize()) {
+        return false;
+    }
+    for (const Node &v1 : vertices) {
+        const Node *v2 = &g.vertices[v1.id];
+        for (int neighbor : v1.neighbors) {
+            if (!v2->neighbors.count(neighbor)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool TriangulatedGraph::hasEdge(int a, int b) const {
+    if (a < 0 || a >= size || b < 0 || b >= size) {
+        return false;
+    } 
+    return vertices[a].neighbors.count(b);
+}
+
+std::vector<Edge> TriangulatedGraph::getNeighbors(Edge &e) const {
+    std::vector<Edge> edges;
+    std::vector<int> neighbors;
+    getSharedNeighbors(this, &vertices[e.first], &vertices[e.second], neighbors);
+    edges.emplace_back(e.first, neighbors[0]);
+    edges.emplace_back(e.second, neighbors[0]);
+    edges.emplace_back(e.first, neighbors[1]);
+    edges.emplace_back(e.second, neighbors[1]);
+    return edges;
+}
+
+bool Node::removeEdge(const int a, const int b) {
+    int other = a == this->id ? b : (b == this->id ? a : -1);
+    if (other == -1) {
+        return false;
+    }
+    neighbors.erase(other);
+    return true;
+}

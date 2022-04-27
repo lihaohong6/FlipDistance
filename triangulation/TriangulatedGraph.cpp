@@ -153,6 +153,19 @@ std::vector<Edge> TriangulatedGraph::getNeighbors(Edge &e) const {
     return edges;
 }
 
+bool TriangulatedGraph::flippable(const Edge &e) {
+    int diff = abs(e.first - e.second);
+    if (diff == 1 || diff == size - 1) {
+        return false;
+    }
+    auto res = flip(e);
+    if (res.first == -1) {
+        return false;
+    }
+    flip(res);
+    return true;
+}
+
 bool Node::removeEdge(const int a, const int b) {
     int other = a == this->id ? b : (b == this->id ? a : -1);
     if (other == -1) {

@@ -3,10 +3,12 @@
 //
 
 #include "gtest/gtest.h"
-#include "../../algo/flip_distance.h"
+#include "../../algo/flip_distance_fast.h"
+#include "../../algo/flip_distance_original.h"
+#include "../../algo/flip_distance_simple.h"
 
 void assertFd(TriangulatedGraph &g1, TriangulatedGraph &g2, int distance, int max) {
-    FlipDistance fd(g1, g2);
+    FlipDistanceSimple fd(g1, g2);
     for (int i = 1; i < distance; i++) {
         ASSERT_FALSE(fd.flipDistanceDecision(i));
     }
@@ -69,7 +71,7 @@ TEST(TestFlipDistance, TestFlipDistance_with8gon) {
     g2.addEdge(2, 4);
     g2.addEdge(2, 6);
     g2.addEdge(4, 6);
-    assertFd(g, g2, 7, 7);
+    assertFd(g, g2, 7, 10);
 }
 
 TEST(TestFlipDistance, TestFlipDistance_with10gon) {
@@ -89,5 +91,5 @@ TEST(TestFlipDistance, TestFlipDistance_with10gon) {
     g2.addEdge(2, 5);
     g2.addEdge(2, 6);
     g2.addEdge(6, 8);
-    assertFd(g, g2, 10, 12);
+    assertFd(g, g2, 10, 11);
 }

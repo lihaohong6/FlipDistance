@@ -38,21 +38,13 @@ public:
     void addEdge(int a, int b);
     
     bool hasEdge(int a, int b) const;
+    bool hasEdge(Edge e) const {
+        return hasEdge(e.first, e.second);
+    }
     
     std::vector<Edge> getNeighbors(Edge &e) const;
     
-    bool flippable(const Edge &e) {
-        int diff = abs(e.first - e.second);
-        if (diff == 1 || diff == size - 1) {
-            return false;
-        }
-        auto res = flip(e);
-        if (res.first == -1) {
-            return false;
-        }
-        flip(res);
-        return true;
-    }
+    bool flippable(const Edge &e);
     
     Edge flip(int a, int b);
     Edge flip(const Edge &e) {
@@ -62,6 +54,18 @@ public:
     BinaryString toBinaryString();
     
     bool isValid();
+    
+    std::vector<Edge> getEdges() {
+        std::vector<Edge> result;
+        for (Node v : vertices) {
+            for (int e : v.neighbors) {
+                if (v.id < e) {
+                    result.emplace_back(v.id, e);
+                }
+            }
+        }
+        return result;
+    }
 
     bool operator==(const TriangulatedGraph &g) const;
 };

@@ -28,15 +28,13 @@ void addEdges(std::vector<Edge> list, std::vector<bool> bits,
     return;
 }
 
-TriangulatedGraph BinaryString::toTriangulatedGraph() {
-    auto sz = size / 2;
-    TriangulatedGraph g(sz);
-    std::vector<std::pair<int, int>> edges;
-    addEdges(edges, bits, 0, bits.size());
-    for (auto p : edges) {
-        g.addEdge(p.first, p.second);
-    }
+TriangulatedGraph BinaryString::toTriangulatedGraph() const {
+    TriangulatedGraph g(getBits());
     return g;
+}
+
+const std::vector<bool> &BinaryString::getBits() const {
+    return bits;
 }
 
 

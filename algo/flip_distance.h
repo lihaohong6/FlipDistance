@@ -5,6 +5,8 @@
 #ifndef FLIPDISTANCE_FLIP_DISTANCE_H
 #define FLIPDISTANCE_FLIP_DISTANCE_H
 
+#include "../triangulation/TriangulatedGraph.h"
+
 struct Action {
     const int type;
     const Edge edge;
@@ -23,7 +25,7 @@ public:
         return false;
     };
 
-    unsigned int flipDistance() {
+    virtual unsigned int flipDistance() {
         if (start == end) {
             return 0;
         }

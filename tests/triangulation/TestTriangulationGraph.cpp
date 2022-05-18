@@ -5,6 +5,12 @@
 #include "gtest/gtest.h"
 #include "../../triangulation/TriangulatedGraph.h"
 
+void makeGraph(TriangulatedGraph &g) {
+    g.addEdge(0, 2);
+    g.addEdge(0, 3);
+    g.addEdge(0, 4);
+}
+
 TEST(TestTriangulationGraph, TestIsValid) {
     TriangulatedGraph g(5);
     EXPECT_FALSE(g.isValid());
@@ -36,4 +42,22 @@ TEST(TestTriangulationGraph, TestFlip) {
     EXPECT_FALSE(g == g2);
     TriangulatedGraph g3(7);
     EXPECT_FALSE(g == g3);
+}
+
+void testRep(TriangulatedGraph &g) {
+    TriangulatedGraph g2(g.toVector());
+    ASSERT_TRUE(g2.isValid());
+    ASSERT_EQ(g.toVector(), g2.toVector());
+}
+
+TEST(TestTriangulationGraph, TestRep) {
+    TriangulatedGraph g(6);
+    makeGraph(g);
+    testRep(g);
+    g.flip(0, 2);
+    testRep(g);
+    g.flip(0, 4);
+    testRep(g);
+    g.flip(0, 3);
+    testRep(g);
 }

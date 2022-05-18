@@ -21,8 +21,10 @@ public:
         this->size = size;
     }
     explicit BinaryString(const std::string&);
-    TriangulatedGraph toTriangulatedGraph();
+    TriangulatedGraph toTriangulatedGraph() const;
     std::string toString();
+
+    const std::vector<bool> &getBits() const;
 };
 
 

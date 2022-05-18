@@ -3,6 +3,7 @@
 //
 
 #include "TriangulatedGraph.h"
+#include "Helper.h"
 
 TriangulatedGraph::TriangulatedGraph(size_t size) : size(size) {
     this->size = size;
@@ -11,6 +12,30 @@ TriangulatedGraph::TriangulatedGraph(size_t size) : size(size) {
     }
     for (int i = 0; i < size; ++i) {
         addEdge(i, (i + 1) % size);
+    }
+}
+
+TriangulatedGraph::TriangulatedGraph(const std::vector<bool> &bits)
+        : TriangulatedGraph(bits.size() / 2 + 2) {
+    std::string s = binaryStringToTreeRep(bits);
+    std::vector<int> stack;
+    int currVertex = 0;
+    // char prev = ' ';
+    for (char c : s) {
+        if (c == 'a') {
+            currVertex += 1;
+            // currVertex += c != prev;
+        }
+        else if (c == '(') {
+            stack.push_back(currVertex);
+        } else if (c == ')') {
+            int v = stack[stack.size() - 1];
+            stack.pop_back();
+            addEdge(v, currVertex);
+        } else {
+            assert(false);
+        }
+        // prev = c;
     }
 }
 
@@ -48,62 +73,11 @@ Edge TriangulatedGraph::flip(const int a, const int b) {
     return {n1, n2};
 }
 
-// deprecated
-std::string triangulationGraphToTreeString(TriangulatedGraph &g) {
-    int size = g.getSize();
-    std::string arr[size];
-    for (Node &v: g.vertices) {
-        for (int neighbor: v.neighbors) {
-            int diff = abs(v.id - neighbor);
-            if (diff != 1 && diff != size - 1 && v.id < neighbor) {
-                arr[v.id] += "(";
-                arr[neighbor] = ")" + arr[neighbor];
-            }
-        }
-    }
-    std::string res;
-    for (auto &s: arr) {
-        res += s + 'a';
-    }
-    res.pop_back();
-    return res;
-}
-
-// deprecated
-std::string treeStringToParentheses(const std::string &s, size_t start = 0, size_t end = -1) {
-    if (end == -1) {
-        end = s.size();
-    }
-    if (start == s.size() || start >= end - 1) {
-        return "";
-    }
-    if (s[start] == 'a') {
-        return "()" + treeStringToParentheses(s, start + 1, end);
-    } else {
-        int counter = 1;
-        size_t index = start + 1;
-        while (counter > 0) {
-            if (s[index] == ')') {
-                counter--;
-            } else if (s[index] == '(') {
-                counter++;
-            }
-            index++;
-        }
-        index--;
-        if (index == end - 1) {
-            return treeStringToParentheses(s, start + 1, end - 1);
-        }
-        return "(" + treeStringToParentheses(s, start + 1, index) +
-               ")" + treeStringToParentheses(s, index + 1, end);
-    }
-}
-
 //std::string toStringRecursive(TriangulatedGraph &g, int start, int end) {
 //    
 //}
 
-BinaryString TriangulatedGraph::toBinaryString() {
+BinaryString TriangulatedGraph::toBinaryString() const {
     // TODO: use more intuitive splitting approach
     return BinaryString(treeStringToParentheses(triangulationGraphToTreeString(*this)));
 }
@@ -114,7 +88,7 @@ size_t TriangulatedGraph::getSize() const {
 
 bool TriangulatedGraph::isValid() {
     size_t total = 0;
-    for (const Node& v: vertices) {
+    for (const Node &v: vertices) {
         total += v.neighbors.size();
     }
     return total / 2 == size * 2 - 3;
@@ -124,9 +98,9 @@ bool TriangulatedGraph::operator==(const TriangulatedGraph &g) const {
     if (size != g.getSize()) {
         return false;
     }
-    for (const Node &v1 : vertices) {
+    for (const Node &v1: vertices) {
         const Node *v2 = &g.vertices[v1.id];
-        for (int neighbor : v1.neighbors) {
+        for (int neighbor: v1.neighbors) {
             if (!v2->neighbors.count(neighbor)) {
                 return false;
             }
@@ -138,7 +112,7 @@ bool TriangulatedGraph::operator==(const TriangulatedGraph &g) const {
 bool TriangulatedGraph::hasEdge(int a, int b) const {
     if (a < 0 || a >= size || b < 0 || b >= size) {
         return false;
-    } 
+    }
     return vertices[a].neighbors.count(b);
 }
 
@@ -164,6 +138,22 @@ bool TriangulatedGraph::flippable(const Edge &e) {
     }
     flip(res);
     return true;
+}
+
+std::vector<bool> TriangulatedGraph::toVector() {
+    return toBinaryString().getBits();
+}
+
+std::vector<Edge> TriangulatedGraph::getEdges() {
+    std::vector<Edge> result;
+    for (Node &v : vertices) {
+        for (int e : v.neighbors) {
+            if (v.id < e) {
+                result.emplace_back(v.id, e);
+            }
+        }
+    }
+    return result;
 }
 
 bool Node::removeEdge(const int a, const int b) {

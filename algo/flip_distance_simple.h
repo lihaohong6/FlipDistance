@@ -25,20 +25,30 @@ public:
         if (remainingFlips == 0) {
             return false;
         }
+        std::vector<Edge> edges;
         for (Edge e: g.getEdges()) {
             if (end.hasEdge(e)) {
                 continue;
             }
             Edge result = g.flip(e);
+            g.flip(result);
             if (flips[result.first][result.second]) {
-                g.flip(result);
                 continue;
             }
+            edges.emplace_back(e);
+            if (end.hasEdge(result)) {
+                edges.clear();
+                edges.push_back(e);
+                break;
+            }
+        }
+        for (Edge e: edges) {
+            Edge result = g.flip(e);
             flips[e.first][e.second] = true;
             bool res = search(g, remainingFlips - 1);
             flips[e.first][e.second] = false;
             g.flip(result);
-            if (res) { //  || end.hasEdge(result)
+            if (res) {
                 return res;
             }
         }
@@ -50,8 +60,7 @@ public:
     }
 
     bool flipDistanceDecision(unsigned int k) override {
-        size_t n = start.getSize();
-        std::fill(flips[0], flips[0] + n * n, 0);
+        std::fill(flips[0], flips[0] + 100 * 100, 0);
         TriangulatedGraph s = start;
         return search(s, k);
     }

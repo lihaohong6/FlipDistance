@@ -6,15 +6,17 @@
 #include "../../algo/flip_distance_fast.h"
 #include "../../algo/flip_distance_original.h"
 #include "../../algo/flip_distance_simple.h"
+#include "../../algo/flip_distance_middle.h"
+#include "../../triangulation/Helper.h"
 
 void assertFd(TriangulatedGraph &g1, TriangulatedGraph &g2, int distance, int max) {
-    FlipDistanceSimple fd(g1, g2);
-    for (int i = 1; i < distance; i++) {
-        ASSERT_FALSE(fd.flipDistanceDecision(i));
-    }
-    for (int i = distance; i <= max; i++) {
-        ASSERT_TRUE(fd.flipDistanceDecision(i));
-    }
+    FlipDistanceMiddle fd(g1, g2);
+//    for (int i = 1; i < distance; i++) {
+//        ASSERT_FALSE(fd.flipDistanceDecision(i));
+//    }
+//    for (int i = distance; i <= max; i++) {
+//        ASSERT_TRUE(fd.flipDistanceDecision(i));
+//    }
     ASSERT_EQ(distance, fd.flipDistance());
 }
 
@@ -92,4 +94,16 @@ TEST(TestFlipDistance, TestFlipDistance_with10gon) {
     g2.addEdge(2, 6);
     g2.addEdge(6, 8);
     assertFd(g, g2, 10, 11);
+}
+
+void testFdStr(std::string s1, std::string s2, int expected) {
+    TriangulatedGraph 
+        g1(BinaryString(treeStringToParentheses(s1)).getBits()),
+        g2(BinaryString(treeStringToParentheses(s2)).getBits());
+    FlipDistanceMiddle fd(g1, g2);
+    ASSERT_EQ(fd.flipDistance(), expected);
+}
+
+TEST(TestFlipDistance, TestFlipDistance_with12gon) {
+    testFdStr("(a((aa)(((aa)(a(a(aa))))a)))a", "((a((aa)a))(a(a(a(aa)))))(aa)", 11);
 }

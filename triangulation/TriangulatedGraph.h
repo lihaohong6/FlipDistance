@@ -34,6 +34,7 @@ public:
     size_t getSize() const;
     
     explicit TriangulatedGraph(size_t size);
+    explicit TriangulatedGraph(const std::vector<bool> &bits);
 
     void addEdge(int a, int b);
     
@@ -51,21 +52,12 @@ public:
         return flip(e.first, e.second);
     }
 
-    BinaryString toBinaryString();
+    BinaryString toBinaryString() const;
+    std::vector<bool> toVector();
     
     bool isValid();
     
-    std::vector<Edge> getEdges() {
-        std::vector<Edge> result;
-        for (Node v : vertices) {
-            for (int e : v.neighbors) {
-                if (v.id < e) {
-                    result.emplace_back(v.id, e);
-                }
-            }
-        }
-        return result;
-    }
+    std::vector<Edge> getEdges();
 
     bool operator==(const TriangulatedGraph &g) const;
 };

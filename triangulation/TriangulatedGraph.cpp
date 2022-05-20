@@ -141,15 +141,15 @@ bool TriangulatedGraph::flippable(const Edge &e) {
     return true;
 }
 
-std::vector<bool> TriangulatedGraph::toVector() {
+std::vector<bool> TriangulatedGraph::toVector() const {
     return toBinaryString().getBits();
 }
 
-std::vector<Edge> TriangulatedGraph::getEdges() {
+std::vector<Edge> TriangulatedGraph::getEdges() const {
     std::vector<Edge> result;
-    for (Node &v : vertices) {
+    for (const Node &v : vertices) {
         for (int e : v.neighbors) {
-            if (v.id < e) {
+            if (v.id < e && e - v.id != 1 && e - v.id != this->size - 1) {
                 result.emplace_back(v.id, e);
             }
         }

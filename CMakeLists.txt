@@ -6,6 +6,13 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(FlipDistance main.cpp triangulation/TriangulatedGraph.cpp triangulation/TriangulatedGraph.h triangulation/BinaryString.cpp triangulation/BinaryString.h utils/helper.h algo/flip_distance_original.h algo/flip_distance_fast.h algo/flip_distance.h algo/flip_distance_simple.h algo/flip_distance_middle.h triangulation/Helper.cpp triangulation/Helper.h algo/flip_distance_bfs.h)
 add_executable(Build main.cpp triangulation/TriangulatedGraph.cpp triangulation/TriangulatedGraph.h triangulation/BinaryString.cpp triangulation/BinaryString.h utils/helper.h algo/flip_distance_original.h algo/flip_distance_fast.h algo/flip_distance.h algo/flip_distance_simple.h algo/flip_distance_middle.h triangulation/Helper.cpp triangulation/Helper.h algo/flip_distance_bfs.h)
 target_compile_options(Build PUBLIC -O3)
+add_executable(RandomTriangulation 
+        triangulation/TriangulatedGraph.cpp triangulation/TriangulatedGraph.h 
+        triangulation/BinaryString.cpp triangulation/BinaryString.h 
+        triangulation/Helper.h triangulation/Helper.cpp
+        rand.cpp)
+target_compile_options(RandomTriangulation PUBLIC -O2)
+
 # 'lib' is the folder with Google Test sources
 add_subdirectory(googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})

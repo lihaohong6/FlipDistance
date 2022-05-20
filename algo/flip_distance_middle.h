@@ -13,6 +13,8 @@
 
 class FlipDistanceMiddle : public FlipDistance {
 public:
+    size_t hashSetSize = 0;
+    
     FlipDistanceMiddle(TriangulatedGraph start, TriangulatedGraph end)
             : FlipDistance(std::move(start), std::move(end)) {}
 
@@ -63,6 +65,7 @@ public:
                         std::vector<bool> v2 = g.toVector();
                         g.flip(result);
                         if (otherSet->count(v2) > 0) {
+                            this->hashSetSize = left.size() + right.size();
                             return dist * 2 - (1 - cur);
                         }
                         if (curSet->insert(v2).second) {

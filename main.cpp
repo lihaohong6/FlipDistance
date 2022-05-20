@@ -19,10 +19,11 @@ int main(int argc, char **argv) {
     
     TriangulatedGraph g(BinaryString(treeStringToParentheses(s1)).getBits());
     TriangulatedGraph g2(BinaryString(treeStringToParentheses(s2)).getBits());
-    FlipDistanceBfs m(g, g2);
+    FlipDistanceMiddle m(g, g2);
     clock_t start = clock();
     printf("%d\n", m.flipDistance());
     clock_t end = clock();
-    printf("%.2f", (double)(end - start) / CLOCKS_PER_SEC);
+    printf("%.2f\n", (double)(end - start) / CLOCKS_PER_SEC);
+    printf("%zu", m.hashSetSize);
     return 0;
 }

@@ -53,11 +53,11 @@ public:
     }
 
     BinaryString toBinaryString() const;
-    std::vector<bool> toVector();
+    std::vector<bool> toVector() const;
     
     bool isValid();
-    
-    std::vector<Edge> getEdges();
+
+    std::vector<Edge> getEdges() const;
 
     bool operator==(const TriangulatedGraph &g) const;
 };

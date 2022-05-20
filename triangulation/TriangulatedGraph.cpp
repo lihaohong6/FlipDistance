@@ -4,6 +4,7 @@
 
 #include "TriangulatedGraph.h"
 #include "Helper.h"
+#include <cassert>
 
 TriangulatedGraph::TriangulatedGraph(size_t size) : size(size) {
     this->size = size;

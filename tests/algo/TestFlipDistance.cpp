@@ -7,10 +7,11 @@
 #include "../../algo/flip_distance_original.h"
 #include "../../algo/flip_distance_simple.h"
 #include "../../algo/flip_distance_middle.h"
+#include "../../algo/flip_distance_bfs.h"
 #include "../../triangulation/Helper.h"
 
 void assertFd(TriangulatedGraph &g1, TriangulatedGraph &g2, int distance, int max) {
-    FlipDistanceMiddle fd(g1, g2);
+    FlipDistanceBfs fd(g1, g2);
 //    for (int i = 1; i < distance; i++) {
 //        ASSERT_FALSE(fd.flipDistanceDecision(i));
 //    }
@@ -96,14 +97,14 @@ TEST(TestFlipDistance, TestFlipDistance_with10gon) {
     assertFd(g, g2, 10, 11);
 }
 
-void testFdStr(std::string s1, std::string s2, int expected) {
+void testFdStr(const std::string& s1, const std::string& s2, int expected) {
     TriangulatedGraph 
         g1(BinaryString(treeStringToParentheses(s1)).getBits()),
         g2(BinaryString(treeStringToParentheses(s2)).getBits());
-    FlipDistanceMiddle fd(g1, g2);
+    FlipDistanceBfs fd(g1, g2);
     ASSERT_EQ(fd.flipDistance(), expected);
 }
 
-TEST(TestFlipDistance, TestFlipDistance_with12gon) {
-    testFdStr("(a((aa)(((aa)(a(a(aa))))a)))a", "((a((aa)a))(a(a(a(aa)))))(aa)", 11);
+TEST(TestFlipDistance, TestFlipDistance_with14gon) {
+    testFdStr("(((a((a((aa)a))a))a)(a(a(aa))))(aa)", "(a(((a((a(a(((aa)a)a)))a))a)(aa)))a", 15);
 }

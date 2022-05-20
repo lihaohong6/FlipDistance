@@ -19,4 +19,5 @@ size_t findNext(const std::vector<T> &l, T a, T b, size_t start) {
     return start - 1;
 }
 
+
 #endif //FLIPDISTANCE_HELPER_H

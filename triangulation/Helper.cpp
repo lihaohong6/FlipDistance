@@ -3,6 +3,7 @@
 //
 
 #include "Helper.h"
+#include <cassert>
 
 int findMatchingFalse(const std::vector<bool> &bits, unsigned int index) {
     unsigned int counter = 1;

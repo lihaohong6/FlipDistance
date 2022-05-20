@@ -50,8 +50,9 @@ public:
                     }
                     std::vector<bool> v2 = g.toVector();
                     g.flip(result);
-                    set.insert(v2);
-                    nextQueue.push(v2);
+                    if(set.insert(v2).second) {
+                        nextQueue.push(v2);
+                    }
                 }
             }
             bfs = nextQueue;

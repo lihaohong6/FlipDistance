@@ -65,8 +65,9 @@ public:
                         if (otherSet->count(v2) > 0) {
                             return dist * 2 - (1 - cur);
                         }
-                        curSet->insert(v2);
-                        nextQueue.push(v2);
+                        if (curSet->insert(v2).second) {
+                            nextQueue.push(v2);
+                        }
                     }
                 }
                 *curQueue = nextQueue;

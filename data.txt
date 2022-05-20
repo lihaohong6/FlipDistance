@@ -1,0 +1,6 @@
+10gon FD: 7
+a((a(aa))((a(a(aa)))a)) (a(((((aa)(aa))a)a)a))a
+12gon FD: 11
+((aa)a)((((aa)a)(a((aa)a)))a) (a((a(((aa)a)(((aa)a)a)))a))a
+14gon FD: 15
+(((a((a((aa)a))a))a)(a(a(aa))))(aa) (a(((a((a(a(((aa)a)a)))a))a)(aa)))a

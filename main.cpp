@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     
     TriangulatedGraph g(BinaryString(treeStringToParentheses(s1)).getBits());
     TriangulatedGraph g2(BinaryString(treeStringToParentheses(s2)).getBits());
-    FlipDistanceMiddle m(g, g2);
+    FlipDistanceBfs m(g, g2);
     clock_t start = clock();
     printf("%d\n", m.flipDistance());
     clock_t end = clock();

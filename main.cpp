@@ -7,10 +7,22 @@
 
 using namespace std;
 
+void printTriangulation(const TriangulatedGraph &g) {
+    printf("%lu\n", g.getSize());
+    for (Edge e : g.getEdges()) {
+        printf("%d %d\n", e.first, e.second);
+    }
+}
+
 int main(int argc, char **argv) {
-    
     if (argc != 3) {
-        printf("Need two arguments.");
+        fprintf(stderr, "Need 2 arguments.");
+        return 1;
+    }
+    if (strcmp(argv[1], "-c") == 0) {
+        BinaryString bs(treeStringToParentheses(argv[2]));
+        printTriangulation(TriangulatedGraph(bs.getBits()));
+        printf("%s\n", bs.toString().c_str());
         return 0;
     }
     std::string 

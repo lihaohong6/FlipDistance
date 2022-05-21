@@ -11,7 +11,7 @@
 bool randBool() {
     static std::random_device rd;
     static std::mt19937 mt(rd());
-    static std::uniform_int_distribution<double> dist(0, 1);
+    static std::uniform_int_distribution<int> dist(0, 1);
     return (bool) dist(mt);
 }
 

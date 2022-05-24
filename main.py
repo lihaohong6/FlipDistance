@@ -11,37 +11,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def rand_triangulation(n: int) -> tuple[str, str]:
-    t1, t2, *rest = \
-        subprocess.check_output(
-            ["cmake-build-debug/RandomTriangulation", str(n - 2)],
-            text=True) \
-            .split("\n")
-    return t1.strip(), t2.strip()
-
-
-def run_program(t1: str, t2: str) -> tuple[int, float, int]:
-    res: str = subprocess.check_output(["cmake-build-debug/Build", t1, t2], text=True)
-    flip_distance, time_usage, memory_usage, *rest = res.split("\n")
-    return int(flip_distance), float(time_usage), int(memory_usage)
-
-
-def plot_memory_usage(start:int, end:int):
-    size_list, memory_list = [], []
-    for vertex_count in range(start, end + 1):
-        print("===========", vertex_count, "===========")
-        for rep in range(1, 20):
-            print(rep)
-            t1, t2 = rand_triangulation(vertex_count)
-            flip_distance, time_usage, memory_usage = run_program(t1, t2)
-            size_list.append(vertex_count)
-            memory_list.append(memory_usage)
-    plt.scatter(size_list, memory_list)
-    y = np.log(np.array(memory_list))
-    print(np.polyfit(size_list, y, 1))
-    plt.show()
-
-
 @dataclasses.dataclass()
 class Triangulation:
     size: int
@@ -50,7 +19,7 @@ class Triangulation:
     tree: str
 
 
-def get_triangulation(s: str) -> Triangulation:
+def convert_triangulation(s: str) -> Triangulation:
     res: str = subprocess.check_output(["cmake-build-debug/Build", "-c", s], text=True)
     lines = res.split("\n")
     n = int(lines[0])
@@ -59,6 +28,37 @@ def get_triangulation(s: str) -> Triangulation:
         v1, v2 = tuple(map(int, lines[i].split()))
         result.append((v1, v2))
     return Triangulation(n, result, lines[n - 2], s)
+
+
+def rand_triangulation(n: int) -> tuple[Triangulation, Triangulation]:
+    t1, t2, *rest = \
+        subprocess.check_output(
+            ["cmake-build-debug/RandomTriangulation", str(n - 2)],
+            text=True) \
+            .split("\n")
+    return convert_triangulation(t1.strip()), convert_triangulation(t2.strip())
+
+
+def run_program(t1: str, t2: str) -> tuple[int, float, int]:
+    res: str = subprocess.check_output(["cmake-build-debug/Build", t1, t2], text=True)
+    flip_distance, time_usage, memory_usage, *rest = res.split("\n")
+    return int(flip_distance), float(time_usage), int(memory_usage)
+
+
+def plot_memory_usage(start: int, end: int):
+    size_list, memory_list = [], []
+    for vertex_count in range(start, end + 1):
+        print("===========", vertex_count, "===========")
+        for rep in range(1, 20):
+            print(rep)
+            t1, t2 = rand_triangulation(vertex_count)
+            flip_distance, time_usage, memory_usage = run_program(t1.tree, t2.tree)
+            size_list.append(vertex_count)
+            memory_list.append(memory_usage)
+    plt.scatter(size_list, memory_list)
+    y = np.log(np.array(memory_list))
+    print(np.polyfit(size_list, y, 1))
+    plt.show()
 
 
 def show_triangulation(canvas: Canvas, t: Triangulation, center_x, center_y, radius):
@@ -81,14 +81,14 @@ DEFAULT_FONT = ("Arial", 36)
 TEMP_DIR = "images/temp.ps"
 
 
-def show_triangulations(t1: str, t2: str, text: str, number: int):
+def show_triangulations(t1: Triangulation, t2: Triangulation, text: str, number: int):
     root = Tk()
     width, height = 1920, 1080
     root.geometry("1920x1080")
     canvas = Canvas(root, width=width, height=height)
     radius = width / 4 - 30
-    show_triangulation(canvas, get_triangulation(t1), width / 4, height / 2, radius)
-    show_triangulation(canvas, get_triangulation(t2), width / 4 * 3, height / 2, radius)
+    show_triangulation(canvas, t1, width / 4, height / 2, radius)
+    show_triangulation(canvas, t2, width / 4 * 3, height / 2, radius)
     canvas.create_text(width / 2, height - 50, text=text, font=DEFAULT_FONT)
     canvas.update()
     canvas.postscript(file=TEMP_DIR, width=1920, height=1080)
@@ -104,7 +104,7 @@ def show_triangulations(t1: str, t2: str, text: str, number: int):
 def progress_bar(current, total):
     char_count = 40
     progress = round(current / total * char_count)
-    print("Progress: " + progress * "#" + (char_count-progress) * "-" + " " + f"{current}/{total}", end="\r")
+    print("Progress: " + progress * "#" + (char_count - progress) * "-" + " " + f"{current}/{total}", end="\r")
 
 
 def find_triangulations(n: int, count: int, image: bool, plot: bool):
@@ -118,7 +118,7 @@ def find_triangulations(n: int, count: int, image: bool, plot: bool):
         progress_bar(imageCount, count)
         while True:
             t1, t2 = rand_triangulation(n)
-            flip_distance, _, mem_usage, *rest = run_program(t1, t2)
+            flip_distance, _, mem_usage, *rest = run_program(t1.tree, t2.tree)
             fd_list.append(flip_distance)
             mem_list.append(mem_usage)
             if not image:
@@ -134,8 +134,32 @@ def find_triangulations(n: int, count: int, image: bool, plot: bool):
         plt.show()
 
 
+def get_degrees(t: Triangulation) -> list[int]:
+    res = []
+    for v in range(t.size):
+        res.append(sum([e.count(v) for e in t.edges]))
+    return res
+
+
+def get_highest_degree_vertex(t1: Triangulation, t2: Triangulation) -> tuple[int, int]:
+    degree_sums = [v[0] + v[1] for v in zip(get_degrees(t1), get_degrees(t2))]
+    max_degree = max(degree_sums)
+    return degree_sums.index(max_degree), max_degree
+
+
+def find_non_trivial_problems(n: int, count: int):
+    for iteration in range(count):
+        t1, t2 = rand_triangulation(n)
+        flip_distance, *rest = run_program(t1.tree, t2.tree)
+        index, degree = get_highest_degree_vertex(t1, t2)
+        show_triangulations(t1, t2,
+                            f"FD: {flip_distance}; Index: {index}; Deg: {degree}; "
+                            f"Ratio: {(2 * n - 6 - degree) / flip_distance}",
+                            iteration)
+
+
 def main():
-    plot_memory_usage(10, 16)
+    find_non_trivial_problems(16, 20)
 
 
 if __name__ == "__main__":

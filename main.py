@@ -5,7 +5,8 @@ import subprocess
 import tkinter
 from pathlib import Path
 from tkinter import Canvas, Tk
-from PIL import ImageGrab, Image
+from PIL import ImageGrab, Image, EpsImagePlugin
+import numpy as np
 
 import matplotlib.pyplot as plt
 
@@ -25,9 +26,8 @@ def run_program(t1: str, t2: str) -> tuple[int, float, int]:
     return int(flip_distance), float(time_usage), int(memory_usage)
 
 
-def plot_memory_usage():
+def plot_memory_usage(start:int, end:int):
     size_list, memory_list = [], []
-    start, end = 10, 18
     for vertex_count in range(start, end + 1):
         print("===========", vertex_count, "===========")
         for rep in range(1, 20):
@@ -37,6 +37,8 @@ def plot_memory_usage():
             size_list.append(vertex_count)
             memory_list.append(memory_usage)
     plt.scatter(size_list, memory_list)
+    y = np.log(np.array(memory_list))
+    print(np.polyfit(size_list, y, 1))
     plt.show()
 
 
@@ -76,6 +78,7 @@ def show_triangulation(canvas: Canvas, t: Triangulation, center_x, center_y, rad
 
 
 DEFAULT_FONT = ("Arial", 36)
+TEMP_DIR = "images/temp.ps"
 
 
 def show_triangulations(t1: str, t2: str, text: str, number: int):
@@ -88,29 +91,51 @@ def show_triangulations(t1: str, t2: str, text: str, number: int):
     show_triangulation(canvas, get_triangulation(t2), width / 4 * 3, height / 2, radius)
     canvas.create_text(width / 2, height - 50, text=text, font=DEFAULT_FONT)
     canvas.update()
-    canvas.postscript(file="images/temp.ps", width=1920, height=1080)
-    img = Image.open("images/temp.ps")
+    canvas.postscript(file=TEMP_DIR, width=1920, height=1080)
+    img = Image.open(TEMP_DIR)
     img.save("images/image" + str(number) + ".png", "png")
     root.destroy()
     with open("images/data.txt", "a") as f:
         f.write(f"{number}: {t1} {t2}\n")
+    img.close()
+    Path(TEMP_DIR).unlink(missing_ok=True)
 
 
-def find_triangulations(n, count):
+def progress_bar(current, total):
+    char_count = 40
+    progress = round(current / total * char_count)
+    print("Progress: " + progress * "#" + (char_count-progress) * "-" + " " + f"{current}/{total}", end="\r")
+
+
+def find_triangulations(n: int, count: int, image: bool, plot: bool):
     p = Path("images")
     shutil.rmtree(p, ignore_errors=True)
     p.mkdir()
+    EpsImagePlugin.gs_windows_binary = r'C:\Program Files\gs\gs9.56.1\bin\gswin64c'
+    fd_list, mem_list = [], []
+    print("Starting...")
     for imageCount in range(count):
+        progress_bar(imageCount, count)
         while True:
             t1, t2 = rand_triangulation(n)
-            flip_distance, *rest = run_program(t1, t2)
-            if flip_distance <= (n - 2) * 1.25:
+            flip_distance, _, mem_usage, *rest = run_program(t1, t2)
+            fd_list.append(flip_distance)
+            mem_list.append(mem_usage)
+            if not image:
+                break
+            elif flip_distance <= (n - 2) * 1.25:
                 show_triangulations(t1, t2, str(flip_distance), imageCount)
                 break
+    if plot:
+        y = np.array(mem_list)
+        y = np.log(y)
+        plt.scatter(fd_list, y)
+        print(np.polyfit(fd_list, y, 1))
+        plt.show()
 
 
 def main():
-    find_triangulations(12, 5)
+    plot_memory_usage(10, 16)
 
 
 if __name__ == "__main__":

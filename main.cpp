@@ -4,6 +4,7 @@
 #include "algo/flip_distance_bfs.h"
 #include "triangulation/Helper.h"
 #include <ctime>
+#include <cstring>
 
 using namespace std;
 

@@ -47,7 +47,7 @@ bool simpleLeftToRight(TriangulatedGraph &s, const TriangulatedGraph &t) {
 }
 
 bool isSimple(TriangulatedGraph &s, TriangulatedGraph &t) {
-    return simpleLeftToRight(s, t) && simpleLeftToRight(t, s);
+    return simpleLeftToRight(s, t) || simpleLeftToRight(t, s);
 }
 
 int main(int argc, char **argv) {
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
     }
     while (true) {
         TriangulatedGraph s(randBits(n)), t(randBits(n));
-        if (!isSimple(s, t)) {
+        if (!noSimple || !isSimple(s, t)) {
             std::cout
                     << binaryStringToTreeRep(s.toVector())
                     << "\n"

@@ -156,30 +156,40 @@ def get_highest_degree_vertex(t1: Triangulation, t2: Triangulation) -> tuple[int
 def find_non_trivial_problems(n: int, count: int):
     init_draw()
     for iteration in range(count):
-        t1, t2 = rand_triangulation(n)
-        flip_distance, *rest = run_program(t1.tree, t2.tree)
-        index, degree = get_highest_degree_vertex(t1, t2)
-        show_triangulations(t1, t2,
-                            f"FD: {flip_distance}; Index: {index}; Deg: {degree}; "
-                            f"Ratio: {(2 * n - 6 - degree) / flip_distance}",
-                            iteration)
+        while True:
+            t1, t2 = rand_triangulation(n)
+            flip_distance, *rest = run_program(t1.tree, t2.tree)
+            if flip_distance >= 1.2 * (n - 3):
+                continue
+            index, degree = get_highest_degree_vertex(t1, t2)
+            message = f"FD: {flip_distance}; Index: {index}; Deg: {degree}; " + \
+                      f"Ratio: {(2 * n - 6 - degree) / flip_distance}"
+            print(message)
+            show_triangulations(t1, t2,
+                                message,
+                                iteration)
+            break
 
 
 def verify(n: int, count: int):
     init_draw()
     for _ in range(count):
-        t1, t2 = rand_triangulation(n)
-        fd1, time1, *rest = run_program(t1.tree, t2.tree)
-        fd2, time2, *rest = run_program(t1.tree, t2.tree, "FdBFS")
-        print(time1, time2)
-        if not fd1 == fd2:
-            message = f"Bfs: {fd2}; M in M: {fd1}"
-            print(message)
-            show_triangulations(t1, t2, message, random.randint(0, 100))
+        while True:
+            t1, t2 = rand_triangulation(n)
+            fd1, time1, *rest = run_program(t1.tree, t2.tree)
+            fd2, time2, *rest = run_program(t1.tree, t2.tree, "FdBFS")
+            if fd2 >= 1.25 * (n - 3):
+                continue
+            print(time1, time2, fd2)
+            if not fd1 == fd2:
+                message = f"Bfs: {fd2}; M in M: {fd1}"
+                print(message)
+                show_triangulations(t1, t2, message, random.randint(0, 100))
+            break
 
 
 def main():
-    verify(10, 100)
+    find_non_trivial_problems(17, 10)
 
 
 if __name__ == "__main__":

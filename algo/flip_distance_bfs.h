@@ -13,6 +13,7 @@
 
 class FlipDistanceBfs : public FlipDistance {
 public:
+    size_t hashSetSize = 0;
     FlipDistanceBfs(TriangulatedGraph start, TriangulatedGraph end)
             : FlipDistance(std::move(start), std::move(end)) {}
 
@@ -46,6 +47,7 @@ public:
                 for (Edge e: candidates) {
                     Edge result = g.flip(e);
                     if (g == end) {
+                        hashSetSize = set.size();
                         return dist;
                     }
                     std::vector<bool> v2 = g.toVector();

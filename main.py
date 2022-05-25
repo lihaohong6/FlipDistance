@@ -1,5 +1,6 @@
 import dataclasses
 import math
+import random
 import shutil
 import subprocess
 import tkinter
@@ -39,8 +40,8 @@ def rand_triangulation(n: int) -> tuple[Triangulation, Triangulation]:
     return convert_triangulation(t1.strip()), convert_triangulation(t2.strip())
 
 
-def run_program(t1: str, t2: str) -> tuple[int, float, int]:
-    res: str = subprocess.check_output(["cmake-build-debug/Build", t1, t2], text=True)
+def run_program(t1: str, t2: str, program_name: str = "Build") -> tuple[int, float, int]:
+    res: str = subprocess.check_output([f"cmake-build-debug/{program_name}", t1, t2], text=True)
     flip_distance, time_usage, memory_usage, *rest = res.split("\n")
     return int(flip_distance), float(time_usage), int(memory_usage)
 
@@ -69,12 +70,13 @@ def show_triangulation(canvas: Canvas, t: Triangulation, center_x, center_y, rad
         y = center_y + math.sin(angle) * radius
         x = center_x + math.cos(angle) * radius
         canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill="#476042")
+        canvas.create_text(x + math.cos(angle) * 25, y + math.sin(angle) * 25, text=str(i), font=DEFAULT_FONT)
         points.append((x, y))
     for e in t.edges:
         canvas.create_line(*points[e[0]], *points[e[1]])
     for p1, p2 in zip([points[-1]] + points, points):
         canvas.create_line(*p1, *p2)
-    canvas.create_text(center_x, center_y - radius - 40, text=t.tree, font=DEFAULT_FONT)
+    canvas.create_text(center_x, center_y - radius - 60, text=t.tree, font=DEFAULT_FONT)
 
 
 DEFAULT_FONT = ("Arial", 36)
@@ -86,7 +88,7 @@ def show_triangulations(t1: Triangulation, t2: Triangulation, text: str, number:
     width, height = 1920, 1080
     root.geometry("1920x1080")
     canvas = Canvas(root, width=width, height=height)
-    radius = width / 4 - 30
+    radius = width / 4 - 80
     show_triangulation(canvas, t1, width / 4, height / 2, radius)
     show_triangulation(canvas, t2, width / 4 * 3, height / 2, radius)
     canvas.create_text(width / 2, height - 50, text=text, font=DEFAULT_FONT)
@@ -107,11 +109,15 @@ def progress_bar(current, total):
     print("Progress: " + progress * "#" + (char_count - progress) * "-" + " " + f"{current}/{total}", end="\r")
 
 
-def find_triangulations(n: int, count: int, image: bool, plot: bool):
+def init_draw():
     p = Path("images")
     shutil.rmtree(p, ignore_errors=True)
     p.mkdir()
     EpsImagePlugin.gs_windows_binary = r'C:\Program Files\gs\gs9.56.1\bin\gswin64c'
+
+
+def find_triangulations(n: int, count: int, image: bool, plot: bool):
+    init_draw()
     fd_list, mem_list = [], []
     print("Starting...")
     for imageCount in range(count):
@@ -148,6 +154,7 @@ def get_highest_degree_vertex(t1: Triangulation, t2: Triangulation) -> tuple[int
 
 
 def find_non_trivial_problems(n: int, count: int):
+    init_draw()
     for iteration in range(count):
         t1, t2 = rand_triangulation(n)
         flip_distance, *rest = run_program(t1.tree, t2.tree)
@@ -158,8 +165,21 @@ def find_non_trivial_problems(n: int, count: int):
                             iteration)
 
 
+def verify(n: int, count: int):
+    init_draw()
+    for _ in range(count):
+        t1, t2 = rand_triangulation(n)
+        fd1, time1, *rest = run_program(t1.tree, t2.tree)
+        fd2, time2, *rest = run_program(t1.tree, t2.tree, "FdBFS")
+        print(time1, time2)
+        if not fd1 == fd2:
+            message = f"Bfs: {fd2}; M in M: {fd1}"
+            print(message)
+            show_triangulations(t1, t2, message, random.randint(0, 100))
+
+
 def main():
-    find_non_trivial_problems(16, 20)
+    verify(10, 100)
 
 
 if __name__ == "__main__":

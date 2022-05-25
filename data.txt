@@ -10,3 +10,6 @@ a((a(aa))((a(a(aa)))a)) (a(((((aa)(aa))a)a)a))a
 (a((a((a(aa))(((aa)((aa)a))a)))a))(a(aa)) (a(aa))(a((aa)((a(a((((a(aa))a)a)a)))a)))
 18gon
 (a((((a((aa)(((((aa)a)(aa))a)a)))(aa))a)(aa)))a (aa)((aa)(a(((aa)a)(a(((a((((aa)a)a)a))a)a)))))
+Problematic case:
+((a((aa)a))a)((aa)((aa)(((aa)a)a))) a(a((((a(a(((((aa)a)a)a)a)))a)a)a))
+((((a((aa)(aa)))a)a)a)a a(a(((a((a(aa))a))a)a))

@@ -35,7 +35,7 @@ inline std::vector<bool> randBits(int n) {
     return result;
 }
 
-bool isSimple(TriangulatedGraph &s, const TriangulatedGraph &t) {
+bool simpleLeftToRight(TriangulatedGraph &s, const TriangulatedGraph &t) {
     for (Edge e: s.getEdges()) {
         Edge result = s.flip(e);
         s.flip(result);
@@ -44,6 +44,10 @@ bool isSimple(TriangulatedGraph &s, const TriangulatedGraph &t) {
         }
     }
     return false;
+}
+
+bool isSimple(TriangulatedGraph &s, TriangulatedGraph &t) {
+    return simpleLeftToRight(s, t) && simpleLeftToRight(t, s);
 }
 
 int main(int argc, char **argv) {

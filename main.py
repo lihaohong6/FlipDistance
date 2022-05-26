@@ -3,6 +3,7 @@ import math
 import random
 import shutil
 import subprocess
+import sys
 import tkinter
 from pathlib import Path
 from tkinter import Canvas, Tk
@@ -113,7 +114,8 @@ def init_draw():
     p = Path("images")
     shutil.rmtree(p, ignore_errors=True)
     p.mkdir()
-    EpsImagePlugin.gs_windows_binary = r'C:\Program Files\gs\gs9.56.1\bin\gswin64c'
+    if sys.platform.startswith("win"):
+        EpsImagePlugin.gs_windows_binary = r'C:\Program Files\gs\gs9.56.1\bin\gswin64c'
 
 
 def find_triangulations(n: int, count: int, image: bool, plot: bool):
@@ -159,8 +161,8 @@ def find_non_trivial_problems(n: int, count: int):
         while True:
             t1, t2 = rand_triangulation(n)
             flip_distance, *rest = run_program(t1.tree, t2.tree)
-            if flip_distance >= 1.2 * (n - 3):
-                continue
+            # if flip_distance >= 1.2 * (n - 3):
+            #     continue
             index, degree = get_highest_degree_vertex(t1, t2)
             message = f"FD: {flip_distance}; Index: {index}; Deg: {degree}; " + \
                       f"Ratio: {(2 * n - 6 - degree) / flip_distance}"

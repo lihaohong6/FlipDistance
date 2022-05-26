@@ -111,9 +111,7 @@ bool TriangulatedGraph::operator==(const TriangulatedGraph &g) const {
 }
 
 bool TriangulatedGraph::hasEdge(int a, int b) const {
-    if (a < 0 || a >= size || b < 0 || b >= size) {
-        return false;
-    }
+    assert(a >= 0 && a < size && b >= 0 && b < size);
     return vertices[a].neighbors.count(b);
 }
 

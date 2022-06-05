@@ -22,12 +22,11 @@ TriangulatedGraph::TriangulatedGraph(const std::vector<bool> &bits)
     std::vector<int> stack;
     int currVertex = 0;
     // char prev = ' ';
-    for (char c : s) {
+    for (char c: s) {
         if (c == 'a') {
             currVertex += 1;
             // currVertex += c != prev;
-        }
-        else if (c == '(') {
+        } else if (c == '(') {
             stack.push_back(currVertex);
         } else if (c == ')') {
             int v = stack[stack.size() - 1];
@@ -115,7 +114,7 @@ bool TriangulatedGraph::hasEdge(int a, int b) const {
     return vertices[a].neighbors.count(b);
 }
 
-std::vector<Edge> TriangulatedGraph::getNeighbors(Edge &e) const {
+std::vector<Edge> TriangulatedGraph::getNeighbors(const Edge &e) const {
     std::vector<Edge> edges;
     std::vector<int> neighbors;
     getSharedNeighbors(this, &vertices[e.first], &vertices[e.second], neighbors);
@@ -145,14 +144,34 @@ std::vector<bool> TriangulatedGraph::toVector() const {
 
 std::vector<Edge> TriangulatedGraph::getEdges() const {
     std::vector<Edge> result;
-    for (const Node &v : vertices) {
-        for (int e : v.neighbors) {
-            if (v.id < e && e - v.id != 1 && e - v.id != this->size - 1) {
+    for (const Node &v: vertices) {
+        for (int e: v.neighbors) {
+            if (v.id < e && !isSimpleEdge(e, v.id)) {
                 result.emplace_back(v.id, e);
             }
         }
     }
     return result;
+}
+
+bool TriangulatedGraph::shareTriangle(const Edge &e1, const Edge &e2) const {
+    if (e1.first == e2.first) {
+        return hasEdge(e1.second, e2.second);
+    }
+    if (e1.first == e2.second) {
+        return hasEdge(e1.second, e2.first);
+    }
+    if (e1.second == e2.first) {
+        return hasEdge(e1.first, e2.second);
+    }
+    if (e1.second == e2.second) {
+        return hasEdge(e1.first, e2.first);
+    }
+    return false;
+}
+
+bool TriangulatedGraph::isSimpleEdge(int a, int b) const {
+    return abs(a - b) == 1 || abs(a - b) == size - 1;
 }
 
 bool Node::removeEdge(const int a, const int b) {

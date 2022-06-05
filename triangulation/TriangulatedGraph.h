@@ -43,7 +43,7 @@ public:
         return hasEdge(e.first, e.second);
     }
     
-    std::vector<Edge> getNeighbors(Edge &e) const;
+    std::vector<Edge> getNeighbors(const Edge &e) const;
     
     bool flippable(const Edge &e);
     
@@ -51,12 +51,15 @@ public:
     Edge flip(const Edge &e) {
         return flip(e.first, e.second);
     }
+    
+    bool shareTriangle(const Edge &e1, const Edge &e2) const;
 
     BinaryString toBinaryString() const;
     std::vector<bool> toVector() const;
     
     bool isValid();
-
+    
+    bool isSimpleEdge(int a, int b) const;
     std::vector<Edge> getEdges() const;
 
     bool operator==(const TriangulatedGraph &g) const;

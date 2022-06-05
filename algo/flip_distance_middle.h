@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include "flip_distance.h"
 #include "../triangulation/BinaryString.h"
+#include "../triangulation/Helper.h"
 
 class FlipDistanceMiddle : public FlipDistance {
 public:
@@ -66,6 +67,7 @@ public:
                         g.flip(result);
                         if (otherSet->count(v2) > 0) {
                             this->hashSetSize = left.size() + right.size();
+                            std::cout << binaryStringToTreeRep(g.toVector()) << std::endl;
                             return dist * 2 - (1 - cur);
                         }
                         if (curSet->insert(v2).second) {

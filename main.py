@@ -4,13 +4,12 @@ import random
 import shutil
 import subprocess
 import sys
-import tkinter
 from pathlib import Path
 from tkinter import Canvas, Tk
-from PIL import ImageGrab, Image, EpsImagePlugin
-import numpy as np
 
 import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image, EpsImagePlugin
 
 
 @dataclasses.dataclass()
@@ -41,24 +40,34 @@ def rand_triangulation(n: int) -> tuple[Triangulation, Triangulation]:
     return convert_triangulation(t1.strip()), convert_triangulation(t2.strip())
 
 
-def run_program(t1: str, t2: str, program_name: str = "Build") -> tuple[int, float, int]:
-    res: str = subprocess.check_output([f"cmake-build-debug/{program_name}", t1, t2], text=True)
+def run_program(t1: str, t2: str, algo_name: str = "dfs") -> tuple[int, float, int]:
+    res: str = subprocess.check_output([f"cmake-build-debug/Build", t1, t2, algo_name], text=True)
     flip_distance, time_usage, memory_usage, *rest = res.split("\n")
     return int(flip_distance), float(time_usage), int(memory_usage)
 
 
-def plot_memory_usage(start: int, end: int):
-    size_list, memory_list = [], []
+def run_program_decision(t1: str, t2: str, algo_name: str = "dfs") -> list[tuple[int, bool, float]]:
+    res: str = subprocess.check_output([f"cmake-build-debug/Build", t1, t2, algo_name, "1"], text=True)
+    result = []
+    for index, line in enumerate(res.split("\n")):
+        k = index + 1
+        ans, time_usage = line.split(" ")
+        result.append((k, ans == "1", float(time_usage)))
+    return result
+
+
+def plot_time_usage(start: int, end: int, algo_name: str):
+    size_list, plot_list = [], []
     for vertex_count in range(start, end + 1):
         print("===========", vertex_count, "===========")
         for rep in range(1, 20):
             print(rep)
             t1, t2 = rand_triangulation(vertex_count)
-            flip_distance, time_usage, memory_usage = run_program(t1.tree, t2.tree)
+            flip_distance, time_usage, memory_usage = run_program(t1.tree, t2.tree, algo_name)
             size_list.append(vertex_count)
-            memory_list.append(memory_usage)
-    plt.scatter(size_list, memory_list)
-    y = np.log(np.array(memory_list))
+            plot_list.append(time_usage)
+    plt.scatter(size_list, plot_list)
+    y = np.log(np.array(plot_list))
     print(np.polyfit(size_list, y, 1))
     plt.show()
 
@@ -173,25 +182,25 @@ def find_non_trivial_problems(n: int, count: int):
             break
 
 
-def verify(n: int, count: int):
+def verify(n: int, count: int, algo1: str, algo2: str):
     init_draw()
     for _ in range(count):
         while True:
             t1, t2 = rand_triangulation(n)
-            fd1, time1, *rest = run_program(t1.tree, t2.tree)
-            fd2, time2, *rest = run_program(t1.tree, t2.tree, "FdBFS")
-            if fd2 >= 1.25 * (n - 3):
-                continue
+            fd1, time1, *rest = run_program(t1.tree, t2.tree, algo1)
+            fd2, time2, *rest = run_program(t1.tree, t2.tree, algo2)
+            # if fd2 >= 1.25 * (n - 3):
+            #     continue
             print(time1, time2, fd2)
             if not fd1 == fd2:
-                message = f"Bfs: {fd2}; M in M: {fd1}"
+                message = f"{algo1}: {fd2}; {algo2}: {fd1}"
                 print(message)
                 show_triangulations(t1, t2, message, random.randint(0, 100))
             break
 
 
 def main():
-    find_non_trivial_problems(17, 10)
+    verify(11, 10, "dfs", "simple")
 
 
 if __name__ == "__main__":

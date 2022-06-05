@@ -8,16 +8,18 @@
 #include "../../algo/flip_distance_simple.h"
 #include "../../algo/flip_distance_middle.h"
 #include "../../algo/flip_distance_bfs.h"
+#include "../../algo/flip_distance_dfs.h"
+#include "../../algo/flip_distance_source.h"
 #include "../../triangulation/Helper.h"
 
 void assertFd(TriangulatedGraph &g1, TriangulatedGraph &g2, int distance, int max) {
-    FlipDistanceBfs fd(g1, g2);
-//    for (int i = 1; i < distance; i++) {
-//        ASSERT_FALSE(fd.flipDistanceDecision(i));
-//    }
-//    for (int i = distance; i <= max; i++) {
-//        ASSERT_TRUE(fd.flipDistanceDecision(i));
-//    }
+    FlipDistanceSource fd(g1, g2);
+    for (int i = 1; i < distance; i++) {
+        ASSERT_FALSE(fd.flipDistanceDecision(i));
+    }
+    for (int i = distance; i <= max; i++) {
+        ASSERT_TRUE(fd.flipDistanceDecision(i));
+    }
     ASSERT_EQ(distance, fd.flipDistance());
 }
 

@@ -12,7 +12,10 @@ a((a(aa))((a(a(aa)))a)) (a(((((aa)(aa))a)a)a))a
 (a((((a((aa)(((((aa)a)(aa))a)a)))(aa))a)(aa)))a (aa)((aa)(a(((aa)a)(a(((a((((aa)a)a)a))a)a)))))
 Problematic case:
 ((a((aa)a))a)((aa)((aa)(((aa)a)a))) a(a((((a(a(((((aa)a)a)a)a)))a)a)a))
+9 vs 10:
 ((((a((aa)(aa)))a)a)a)a a(a(((a((a(aa))a))a)a))
+8 vs 9:
+a((a(a(((aa)a)a)))a) ((aa)(aa))(a(a(aa)))
 
 Result for comparing BFS with M in M
 0.14 3.03 13

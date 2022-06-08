@@ -40,44 +40,6 @@ public:
         }
     }
 
-    void generateSources(const std::vector<Edge> &edges, int index, const TriangulatedGraph &g,
-                         std::vector<Edge> &cur, std::unordered_multiset<Edge, HashEdge> &forbid,
-                         std::vector<std::vector<Edge>> &existing) {
-        if (index == edges.size()) {
-            existing.push_back(cur);
-            return;
-        }
-        bool canAdd = !forbid.count(edges[index]);
-        generateSources(edges, index + 1, g, cur, forbid, existing);
-        if (canAdd) {
-            auto q2 = cur;
-            q2.push_back(edges[index]);
-            addNeighborsToForbid(edges[index], g, forbid);
-            generateSources(edges, index + 1, g, q2, forbid, existing);
-            removeNeighborsFromForbid(edges[index], g, forbid);
-        }
-    }
-
-    void generateSources(const std::vector<Edge> &edges, const TriangulatedGraph &g,
-                         std::vector<std::vector<Edge>> &existing) {
-        std::vector<Edge> empty;
-        std::unordered_multiset<Edge, HashEdge> forbid;
-        for (const Edge &e: end.getEdges()) {
-            forbid.insert(e);
-        }
-        generateSources(edges, 0, g, empty, forbid, existing);
-    }
-
-    template<class InputIterator>
-    void generateSources(InputIterator b, InputIterator e, const TriangulatedGraph &g,
-                         std::vector<std::vector<Edge>> &existing) {
-        std::vector<Edge> edges;
-        for (; b != e; ++b) {
-            edges.push_back(*b);
-        }
-        generateSources(edges, g, existing);
-    }
-
     void generateNext(const std::vector<std::pair<Edge, Edge>> &edges, int index,
                       TriangulatedGraph &g, std::vector<Edge> &cur,
                       std::unordered_multiset<Edge, HashEdge> &forbid,
@@ -152,8 +114,7 @@ public:
 
     bool flipDistanceDecision(unsigned int k) override {
         branchCounter = 0;
-        std::vector<std::vector<Edge>> sources;
-        generateSources(start.getEdges(), start, sources);
+        std::vector<std::vector<Edge>> sources = start.getSources();
         for (auto &source: sources) {
             if (search(source, start, (int) k)) {
                 return true;

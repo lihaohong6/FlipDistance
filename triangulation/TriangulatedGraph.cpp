@@ -8,6 +8,7 @@
 #include "../utils/helper.h"
 #include "../config.h"
 #include <cassert>
+#include <unordered_set>
 
 TriangulatedGraph::TriangulatedGraph(size_t size) : size(size) {
     this->size = size;
@@ -261,38 +262,38 @@ void assignEdge(const TriangulatedGraph &g, Vertex *v, const Edge &e, Vertex *pr
     assert(false);
 }
 
-size_t nodeCount, totalNodes;
+bool canSelect(Vertex *v, std::vector<bool> &selections) {
+    if (v->top == nullptr) {
+        return false;
+    }
+    if (selections[v->top->id]) {
+        return false;
+    }
+    if (v->top->left != nullptr && selections[v->top->left->id]) {
+        return false;
+    }
+    return true;
+}
 
 void independentSet(std::vector<std::vector<Edge>> &accumulator, 
-                    std::vector<Edge> &selection, Vertex *v, bool choose) {
-    if (v == nullptr) {
-        return;
-    }
-    nodeCount++;
-    if (nodeCount == totalNodes) {
-        if (choose) {
-            selection.push_back(v->e);
-            accumulator.push_back(selection);
-            selection.pop_back();
-        } else {
-            accumulator.push_back(selection);
+                    std::vector<Vertex*> &vertices, std::vector<bool> &selections, int index) {
+    if (index == vertices.size()) {
+        std::vector<Edge> result;
+        for (int i = 0; i < selections.size(); ++i) {
+            if (selections[i]) {
+                result.push_back(vertices[i]->e);
+            }
         }
+        accumulator.push_back(result);
         return;
     }
-    if (choose) {
-        selection.push_back(v->e);
-        independentSet(accumulator, selection, v->left, false);
-        independentSet(accumulator, selection, v->right, false);
-        selection.pop_back();
-    } else {
-        independentSet(accumulator, selection, v->left, true);
-        independentSet(accumulator, selection, v->right, false);
-        independentSet(accumulator, selection, v->left, false);
-        independentSet(accumulator, selection, v->right, true);
-        independentSet(accumulator, selection, v->left, false);
-        independentSet(accumulator, selection, v->right, false);
+    Vertex *v = vertices[index];
+    if (canSelect(v, selections)) {
+        selections[index] = true;
+        independentSet(accumulator, vertices, selections, index + 1);
+        selections[index] = false;
     }
-    nodeCount--;
+    independentSet(accumulator, vertices, selections, index + 1);
 }
 
 std::vector<std::vector<Edge>> TriangulatedGraph::getSources() const {
@@ -307,10 +308,10 @@ std::vector<std::vector<Edge>> TriangulatedGraph::getSources() const {
     assignEdge(*this, root->left, left, root);
     assignEdge(*this, root->right, right, root);
     vector<vector<Edge>> accumulator;
-    vector<Edge> selection;
-    totalNodes = this->size - 2;
-    nodeCount = 0;
-    independentSet(accumulator, selection, root, false);
+    int totalNodes = this->size - 2;
+    std::vector<Vertex*> list = preOrder(root);
+    std::vector<bool> selection(totalNodes);
+    independentSet(accumulator, list, selection, 1);
     return accumulator;
 }
 

@@ -5,6 +5,8 @@
 #ifndef FLIPDISTANCE_EDGE_H
 #define FLIPDISTANCE_EDGE_H
 
+#include <algorithm>
+
 struct Edge {
     int first;
     int second;

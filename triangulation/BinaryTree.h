@@ -6,8 +6,10 @@
 #define FLIPDISTANCE_BINARYTREE_H
 
 #include "Edge.h"
+#include <vector>
 
 struct Vertex {
+    int id = -1;
     Edge e;
     Vertex *top, *left, *right;
     
@@ -23,5 +25,7 @@ struct Vertex {
         delete right;
     }
 };
+
+std::vector<Vertex*> preOrder(Vertex* root);
 
 #endif //FLIPDISTANCE_BINARYTREE_H

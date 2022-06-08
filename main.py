@@ -34,7 +34,7 @@ def convert_triangulation(s: str) -> Triangulation:
 def rand_triangulation(n: int) -> tuple[Triangulation, Triangulation]:
     t1, t2, *rest = \
         subprocess.check_output(
-            ["cmake-build-debug/RandomTriangulation", str(n - 2)],
+            ["cmake-build-debug/RandomTriangulation", str(n)],
             text=True) \
             .split("\n")
     return convert_triangulation(t1.strip()), convert_triangulation(t2.strip())

@@ -37,6 +37,14 @@ FlipDistance* getAlgoByName(const std::string &name, TriangulatedGraph &g, Trian
     exit(1);
 }
 
+inline std::string vectorToString(const std::vector<int>& v) {
+    std::string res;
+    for (int i : v) {
+        res += std::to_string(i);
+    }
+    return res;
+}
+
 int main(int argc, char **argv) {
     if (argc < 3) {
         fprintf(stderr, "Need at least 2 arguments.");
@@ -65,10 +73,13 @@ int main(int argc, char **argv) {
     if (decision) {
         size_t start = 1, end = g.getSize() * 2 - 6;
         for (size_t i = start; i <= end; ++i) {
+            // i = g.getSize() * 1.5;
             clock_t startTime = clock();
             printf("%d ", m->flipDistanceDecision(i));
             clock_t endTime = clock();
-            printf("%.2f\n", (double)(endTime - startTime) / CLOCKS_PER_SEC);
+            printf("%.2f %s\n", 
+                   (double)(endTime - startTime) / CLOCKS_PER_SEC, 
+                   vectorToString(m->getStatistics()).c_str());
         }
     } else {
         clock_t startTime = clock();

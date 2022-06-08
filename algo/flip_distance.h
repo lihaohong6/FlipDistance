@@ -40,6 +40,10 @@ public:
         }
         return min;
     }
+    
+    virtual std::vector<int> getStatistics() {
+        return {};
+    }
 };
 
 #endif //FLIPDISTANCE_FLIP_DISTANCE_H

@@ -18,19 +18,23 @@ struct HashEdge {
 };
 
 class FlipDistanceSource : public FlipDistance {
+private:
+    int branchCounter = 0;
+    
 public:
+
     FlipDistanceSource(TriangulatedGraph start, TriangulatedGraph end)
             : FlipDistance(std::move(start), std::move(end)) {}
 
-    void addNeighborsToForbid(const Edge &e, const TriangulatedGraph &g,
-                              std::unordered_multiset<Edge, HashEdge> &forbid) {
+    static void addNeighborsToForbid(const Edge &e, const TriangulatedGraph &g,
+                                     std::unordered_multiset<Edge, HashEdge> &forbid) {
         for (const Edge &neighbor: g.getNeighbors(e)) {
             forbid.insert(neighbor);
         }
     }
 
-    void removeNeighborsFromForbid(const Edge &e, const TriangulatedGraph &g,
-                                   std::unordered_multiset<Edge, HashEdge> &forbid) {
+    static void removeNeighborsFromForbid(const Edge &e, const TriangulatedGraph &g,
+                                          std::unordered_multiset<Edge, HashEdge> &forbid) {
         for (const Edge &neighbor: g.getNeighbors(e)) {
             forbid.erase(neighbor);
         }
@@ -58,6 +62,9 @@ public:
                          std::vector<std::vector<Edge>> &existing) {
         std::vector<Edge> empty;
         std::unordered_multiset<Edge, HashEdge> forbid;
+        for (const Edge &e: end.getEdges()) {
+            forbid.insert(e);
+        }
         generateSources(edges, 0, g, empty, forbid, existing);
     }
 
@@ -81,7 +88,7 @@ public:
         }
         generateNext(edges, index + 1, g, cur, forbid, accumulator);
         for (const Edge &e: {edges[index].first, edges[index].second}) {
-            if (!g.flippable(e)) {
+            if (!g.flippable(e) || end.hasEdge(e) || forbid.count(e)) {
                 continue;
             }
             Edge res = g.flip(e);
@@ -95,6 +102,7 @@ public:
     }
 
     bool search(const std::vector<Edge> &sources, TriangulatedGraph g, int k) {
+        branchCounter++;
         if (g == end && k >= 0) {
             return true;
         }
@@ -106,17 +114,7 @@ public:
         }
         std::vector<Edge> freeEdges;
         std::unordered_multiset<Edge, HashEdge> forbid;
-        TriangulatedGraph g2 = g;
         auto flipped = 0;
-//        for (const Edge &e : g2.getEdges()) {
-//            Edge res = g.flip(e);
-//            if (!end.hasEdge(res)) {
-//                g.flip(res);
-//                continue;
-//            }
-//            flipped++;
-//            addNeighborsToForbid(res, g, forbid);
-//        }
         std::vector<std::pair<Edge, Edge>> next;
         std::vector<std::vector<Edge>> accumulator;
         for (const Edge &e: sources) {
@@ -131,6 +129,7 @@ public:
                     Edge res = g.flip(neighbor);
                     if (end.hasEdge(res)) {
                         freeEdges.push_back(neighbor);
+                        forbid.insert(neighbor);
                         addNeighborsToForbid(neighbor, g, forbid);
                     }
                     g.flip(res);
@@ -138,6 +137,9 @@ public:
                 next.emplace_back(neighbors[0], neighbors[1]);
                 next.emplace_back(neighbors[2], neighbors[3]);
             }
+        }
+        if (flipped > k) {
+            return false;
         }
         generateNext(next, 0, g, freeEdges, forbid, accumulator);
         for (const auto &edges: accumulator) {
@@ -149,14 +151,19 @@ public:
     }
 
     bool flipDistanceDecision(unsigned int k) override {
+        branchCounter = 0;
         std::vector<std::vector<Edge>> sources;
         generateSources(start.getEdges(), start, sources);
         for (auto &source: sources) {
-            if (search(source, start, (int)k)) {
+            if (search(source, start, (int) k)) {
                 return true;
             }
         }
         return false;
+    }
+
+    std::vector<int> getStatistics() override {
+        return {branchCounter};
     }
 };
 

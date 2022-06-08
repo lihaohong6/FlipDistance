@@ -23,7 +23,7 @@ std::string BinaryString::toString() {
 
 void addEdges(std::vector<Edge> list, std::vector<bool> bits, 
               size_t start, size_t end) {
-    auto closing = findNext(bits, true, false, start + 1);
+    // auto closing = findNext(bits, true, false, start + 1);
     // TODO: finish this
     return;
 }

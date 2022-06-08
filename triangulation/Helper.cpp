@@ -93,8 +93,7 @@ std::string triangulationGraphToTreeString(const TriangulatedGraph &g) {
     std::string arr[size];
     for (const Node &v: g.vertices) {
         for (int neighbor: v.neighbors) {
-            int diff = abs(v.id - neighbor);
-            if (diff != 1 && diff != size - 1 && v.id < neighbor) {
+            if (!g.isSimpleEdge(v.id, neighbor) && v.id < neighbor) {
                 arr[v.id] += "(";
                 arr[neighbor] = ")" + arr[neighbor];
             }

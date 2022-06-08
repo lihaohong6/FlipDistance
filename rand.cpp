@@ -71,8 +71,8 @@ int main(int argc, char **argv) {
                     << "\n"
                     << binaryStringToTreeRep(t.toVector())
                     << "\n";
+            s.getSources();
             break;
         }
     }
-
 }

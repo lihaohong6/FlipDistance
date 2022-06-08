@@ -4,6 +4,9 @@
 
 #include "TriangulatedGraph.h"
 #include "Helper.h"
+#include "BinaryTree.h"
+#include "../utils/helper.h"
+#include "../config.h"
 #include <cassert>
 
 TriangulatedGraph::TriangulatedGraph(size_t size) : size(size) {
@@ -44,25 +47,26 @@ void TriangulatedGraph::addEdge(int a, int b) {
     vertices[b].neighbors.insert(a);
 }
 
-void getSharedNeighbors(const TriangulatedGraph *g, const Node *v1, const Node *v2, std::vector<int> &result) {
-    std::vector<int> neighbor1(g->getSize()), neighbor2(g->getSize());
+std::vector<int> getSharedNeighbors(const TriangulatedGraph *g, const Node *v1, const Node *v2) {
+    std::vector<int> result;
+    std::vector<bool> neighbor1(g->getSize()), neighbor2(g->getSize());
     for (int n: v1->neighbors) {
-        neighbor1[n] = 1;
+        neighbor1[n] = true;
     }
     for (int n: v2->neighbors) {
-        neighbor2[n] = 1;
+        neighbor2[n] = true;
     }
     for (int i = 0; i < g->getSize(); i++) {
-        if (neighbor1[i] == neighbor2[i] && neighbor1[i] == 1) {
+        if (neighbor1[i] && neighbor2[i]) {
             result.push_back(i);
         }
     }
+    return result;
 }
 
 Edge TriangulatedGraph::flip(const int a, const int b) {
     Node *v1 = &vertices[a], *v2 = &vertices[b];
-    std::vector<int> sharedNeighbors;
-    getSharedNeighbors(this, v1, v2, sharedNeighbors);
+    std::vector<int> sharedNeighbors = getSharedNeighbors(this, v1, v2);
     if (sharedNeighbors.size() != 2) {
         return {-1, -1};
     }
@@ -114,14 +118,15 @@ bool TriangulatedGraph::hasEdge(int a, int b) const {
     return vertices[a].neighbors.count(b);
 }
 
-std::vector<Edge> TriangulatedGraph::getNeighbors(const Edge &e) const {
+std::vector<Edge> TriangulatedGraph::getNeighbors(const Edge &e, bool includeBoundary) const {
     std::vector<Edge> edges;
-    std::vector<int> neighbors;
-    getSharedNeighbors(this, &vertices[e.first], &vertices[e.second], neighbors);
+    std::vector<int> neighbors = getSharedNeighbors(this, &vertices[e.first], &vertices[e.second]);
     edges.emplace_back(e.first, neighbors[0]);
     edges.emplace_back(e.second, neighbors[0]);
-    edges.emplace_back(e.first, neighbors[1]);
-    edges.emplace_back(e.second, neighbors[1]);
+    if (neighbors.size() > 1) {
+        edges.emplace_back(e.first, neighbors[1]);
+        edges.emplace_back(e.second, neighbors[1]);
+    }
     return edges;
 }
 
@@ -172,6 +177,145 @@ bool TriangulatedGraph::shareTriangle(const Edge &e1, const Edge &e2) const {
 
 bool TriangulatedGraph::isSimpleEdge(int a, int b) const {
     return abs(a - b) == 1 || abs(a - b) == size - 1;
+}
+
+size_t findMatchingParenthesis(const std::string &s, int index) {
+    return findNext(s.begin() + index, s.end(), '(', ')', index);
+}
+
+std::string substr(const std::string &s, size_t start, size_t end = -1) {
+    if (end == -1) {
+        end = s.length();
+    }
+    return s.substr(start, end - start);
+}
+
+std::string preprocess(const std::string &s) {
+    if (s[0] == 'a') {
+        return s;
+    }
+    auto match = findMatchingParenthesis(s, 1);
+    if (match == s.length() - 1) {
+        return substr(s, 1, s.length() - 1);
+    }
+    return s;
+}
+
+Vertex *buildVertex(const std::string &s) {
+    if (s == "a") {
+        return nullptr;
+    }
+    auto *v = new Vertex();
+    std::string left, right;
+    if (s[0] != 'a') {
+        auto split = findMatchingParenthesis(s, 1);
+        left = substr(s, 1, split);
+        right = preprocess(substr(s, split + 1));
+    } else {
+        if (s.length() > 1 && s[1] == 'a') {
+            left = right = "a";
+        } else {
+            left = "a";
+            right = preprocess(substr(s, 1));
+        }
+    }
+    v->left = buildVertex(left);
+    v->right = buildVertex(right);
+    return v;
+}
+
+void sortEdge(Edge &e1, Edge &e2) {
+    if (e2 < e1) {
+        std::swap(e1, e2);
+    }
+}
+
+void assignEdge(const TriangulatedGraph &g, Vertex *v, const Edge &e, Vertex *prev) {
+    if ((v == nullptr) ^ g.isSimpleEdge(e)) {
+        assert(false);
+    }
+    if ((v == nullptr) && g.isSimpleEdge(e)) {
+        return;
+    }
+    v->top = prev;
+    v->e = e;
+    auto neighbors = g.getNeighbors(e);
+    int index = 0;
+    for (auto neighbor: neighbors) {
+        if (neighbor == prev->e) {
+            Edge e1, e2;
+            if (index < 2) {
+                e1 = neighbors[2];
+                e2 = neighbors[3];
+            } else {
+                e1 = neighbors[0];
+                e2 = neighbors[1];
+            }
+            sortEdge(e1, e2);
+            assignEdge(g, v->left, e1, v);
+            assignEdge(g, v->right, e2, v);
+            return;
+        }
+        index++;
+    }
+    assert(false);
+}
+
+size_t nodeCount, totalNodes;
+
+void independentSet(std::vector<std::vector<Edge>> &accumulator, 
+                    std::vector<Edge> &selection, Vertex *v, bool choose) {
+    if (v == nullptr) {
+        return;
+    }
+    nodeCount++;
+    if (nodeCount == totalNodes) {
+        if (choose) {
+            selection.push_back(v->e);
+            accumulator.push_back(selection);
+            selection.pop_back();
+        } else {
+            accumulator.push_back(selection);
+        }
+        return;
+    }
+    if (choose) {
+        selection.push_back(v->e);
+        independentSet(accumulator, selection, v->left, false);
+        independentSet(accumulator, selection, v->right, false);
+        selection.pop_back();
+    } else {
+        independentSet(accumulator, selection, v->left, true);
+        independentSet(accumulator, selection, v->right, false);
+        independentSet(accumulator, selection, v->left, false);
+        independentSet(accumulator, selection, v->right, true);
+        independentSet(accumulator, selection, v->left, false);
+        independentSet(accumulator, selection, v->right, false);
+    }
+    nodeCount--;
+}
+
+std::vector<std::vector<Edge>> TriangulatedGraph::getSources() const {
+    using namespace std;
+    Vertex *root = toBinaryTree();
+    Edge start(0, size - 1);
+    root->e = start;
+    auto neighbors = getNeighbors(start);
+    assert(neighbors.size() == 2);
+    Edge left = neighbors[0], right = neighbors[1];
+    sortEdge(left, right);
+    assignEdge(*this, root->left, left, root);
+    assignEdge(*this, root->right, right, root);
+    vector<vector<Edge>> accumulator;
+    vector<Edge> selection;
+    totalNodes = this->size - 2;
+    nodeCount = 0;
+    independentSet(accumulator, selection, root, false);
+    return accumulator;
+}
+
+Vertex *TriangulatedGraph::toBinaryTree() const {
+    return buildVertex(triangulationGraphToTreeString(*this));
 }
 
 bool Node::removeEdge(const int a, const int b) {

@@ -4,6 +4,8 @@
 
 #include "gtest/gtest.h"
 #include "../../triangulation/TriangulatedGraph.h"
+#include "../../triangulation/BinaryTree.h"
+#include "../../triangulation/Helper.h"
 
 void makeGraph(TriangulatedGraph &g) {
     g.addEdge(0, 2);
@@ -60,4 +62,16 @@ TEST(TestTriangulationGraph, TestRep) {
     testRep(g);
     g.flip(0, 3);
     testRep(g);
+}
+
+TEST(TestTriangulationGraph, TestToTree) {
+    TriangulatedGraph g(6);
+    makeGraph(g);
+    printf("%s\n", binaryStringToTreeRep(g.toBinaryString().getBits()).c_str());
+    Vertex *v = g.toBinaryTree();
+    ASSERT_EQ(nullptr, v->right);
+    ASSERT_EQ(nullptr, v->left->right);
+    ASSERT_EQ(nullptr, v->left->left->right);
+    ASSERT_EQ(nullptr, v->left->left->left->right);
+    ASSERT_EQ(nullptr, v->left->left->left->left);
 }

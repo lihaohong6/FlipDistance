@@ -7,6 +7,9 @@
 
 #include <set>
 #include "BinaryString.h"
+#include <vector>
+#include "BinaryTree.h"
+#include "Edge.h"
 
 class BinaryString;
 
@@ -24,46 +27,59 @@ struct Node {
     bool removeEdge(int a, int b);
 };
 
-typedef std::pair<int, int> Edge;
+// typedef std::pair<int, int> Edge;
 
 class TriangulatedGraph {
 private:
     size_t size;
 public:
     std::vector<Node> vertices;
+
     size_t getSize() const;
-    
+
     explicit TriangulatedGraph(size_t size);
+
     explicit TriangulatedGraph(const std::vector<bool> &bits);
 
     void addEdge(int a, int b);
-    
+
     bool hasEdge(int a, int b) const;
+
     bool hasEdge(Edge e) const {
         return hasEdge(e.first, e.second);
     }
-    
-    std::vector<Edge> getNeighbors(const Edge &e) const;
-    
+
+    std::vector<Edge> getNeighbors(const Edge &e, bool includeBoundary = false) const;
+
     bool flippable(const Edge &e);
-    
+
     Edge flip(int a, int b);
+
     Edge flip(const Edge &e) {
         return flip(e.first, e.second);
     }
-    
+
     bool shareTriangle(const Edge &e1, const Edge &e2) const;
 
     BinaryString toBinaryString() const;
+
     std::vector<bool> toVector() const;
     
+    Vertex* toBinaryTree() const;
+
     bool isValid();
-    
+
     bool isSimpleEdge(int a, int b) const;
+    bool isSimpleEdge(Edge e) const {
+        return isSimpleEdge(e.first, e.second);
+    }
+
     std::vector<Edge> getEdges() const;
 
     bool operator==(const TriangulatedGraph &g) const;
-};
 
+    std::vector<std::vector<Edge>> getSources() const;
+
+};
 
 #endif //FLIPDISTANCE_TRIANGULATEDGRAPH_H

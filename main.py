@@ -76,7 +76,7 @@ def show_triangulation(canvas: Canvas, t: Triangulation, center_x, center_y, rad
     delta_angle = 2 * math.pi / t.size
     points: list[tuple[int, int]] = []
     for i in range(t.size):
-        angle = i * delta_angle
+        angle = -(i + 2) * delta_angle
         y = center_y + math.sin(angle) * radius
         x = center_x + math.cos(angle) * radius
         canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill="#476042")
@@ -200,7 +200,8 @@ def verify(n: int, count: int, algo1: str, algo2: str):
 
 
 def main():
-    verify(11, 10, "dfs", "simple")
+    t1, t2 = rand_triangulation(6)
+    show_triangulations(t1, t2, "", 0)
 
 
 if __name__ == "__main__":

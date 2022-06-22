@@ -15,7 +15,6 @@ void printRandomTriangulation(int n, bool noSimple) {
             << "\n";
 }
 
-
 int main(int argc, char **argv) {
     if (argc < 2) {
         printf("Expect at least one command line argument.");

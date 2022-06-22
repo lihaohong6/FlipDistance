@@ -50,7 +50,7 @@ bool isSimple(TriangulatedGraph &s, TriangulatedGraph &t) {
 
 std::pair<TriangulatedGraph, TriangulatedGraph> randomTriangulation(int n, bool noSimple) {
     while (true) {
-        TriangulatedGraph s(randBits(n - 2)), t(randBits(n - 2));
+        TriangulatedGraph s(randBits(n - 3)), t(randBits(n - 3));
         if (!noSimple || !isSimple(s, t)) {
             return {s, t};
         }

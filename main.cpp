@@ -22,10 +22,6 @@ void printTriangulation(const TriangulatedGraph &g) {
     }
 }
 
-void measureFpt() {
-    
-}
-
 FlipDistance* getAlgoByName(const std::string &name, TriangulatedGraph &g, TriangulatedGraph &g2) {
     if (name == "bfs") return new FlipDistanceBfs(g, g2);
     if (name == "dfs") return new FlipDistanceDfs(g, g2);

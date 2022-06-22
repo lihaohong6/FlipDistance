@@ -5,6 +5,9 @@
 #include "utils/rand.h"
 
 int main() {
+    int i = *((int*)malloc(4));
+    delete &i;
+    printf("%d\n", i);
     int r = 100;
     while (r--) {
         auto p = randomTriangulation(24);

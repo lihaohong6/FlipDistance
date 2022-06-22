@@ -44,6 +44,8 @@ TriangulatedGraph::TriangulatedGraph(const std::vector<bool> &bits)
 }
 
 void TriangulatedGraph::addEdge(int a, int b) {
+    assert(0 <= a && a < size);
+    assert(0 <= b && b < size);
     vertices[a].neighbors.insert(b);
     vertices[b].neighbors.insert(a);
 }
@@ -275,8 +277,8 @@ bool canSelect(Vertex *v, std::vector<bool> &selections) {
     return true;
 }
 
-void independentSet(std::vector<std::vector<Edge>> &accumulator, 
-                    std::vector<Vertex*> &vertices, std::vector<bool> &selections, int index) {
+void independentSet(std::vector<std::vector<Edge>> &accumulator,
+                    std::vector<Vertex *> &vertices, std::vector<bool> &selections, int index) {
     if (index == vertices.size()) {
         std::vector<Edge> result;
         for (int i = 0; i < selections.size(); ++i) {
@@ -309,7 +311,7 @@ std::vector<std::vector<Edge>> TriangulatedGraph::getSources() const {
     assignEdge(*this, root->right, right, root);
     vector<vector<Edge>> accumulator;
     int totalNodes = this->size - 2;
-    std::vector<Vertex*> list = preOrder(root);
+    std::vector<Vertex *> list = preOrder(root);
     std::vector<bool> selection(totalNodes);
     independentSet(accumulator, list, selection, 1);
     return accumulator;
@@ -320,20 +322,20 @@ Vertex *TriangulatedGraph::toBinaryTree() const {
 }
 
 TriangulatedGraph TriangulatedGraph::subGraph(int start, int end) const {
-    int newSize = start <= end ? end - start + 1 : (int)size - (end - start + 1) + 2;
+    int newSize = start <= end ? end - start + 1 : (int) size - (start - end + 1) + 2;
     TriangulatedGraph result(newSize);
     std::vector<Edge> edges = filterAndMapEdges(start, end, getEdges());
-    for (Edge e : edges) {
+    for (Edge e: edges) {
         result.addEdge(e);
     }
     return result;
 }
 
-std::vector<Edge> TriangulatedGraph::filterAndMapEdges(int start, int end, const std::vector<Edge> &edges) const{
+std::vector<Edge> TriangulatedGraph::filterAndMapEdges(int start, int end, const std::vector<Edge> &edges) const {
     std::vector<Edge> result;
     auto predicate = [&](int e) -> bool {
         if (start <= end) {
-            return start <= e <= end;
+            return start <= e && e <= end;
         }
         return start <= e || e <= end;
     };
@@ -341,9 +343,9 @@ std::vector<Edge> TriangulatedGraph::filterAndMapEdges(int start, int end, const
         if (start <= end) {
             return v - start;
         }
-        return v >= start ? v - start : v + (int)size - start;
+        return v >= start ? v - start : v + (int) size - start;
     };
-    for (Edge e : edges) {
+    for (Edge e: edges) {
         if (!isSimpleEdge(e) && predicate(e.first) && predicate(e.second)) {
             result.emplace_back(mapper(e.first), mapper(e.second));
         }

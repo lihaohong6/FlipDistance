@@ -193,15 +193,14 @@ def verify(n: int, count: int, algo1: str, algo2: str):
             #     continue
             print(time1, time2, fd2)
             if not fd1 == fd2:
-                message = f"{algo1}: {fd2}; {algo2}: {fd1}"
+                message = f"{algo1}: {fd1}; {algo2}: {fd2}"
                 print(message)
                 show_triangulations(t1, t2, message, random.randint(0, 100))
             break
 
 
 def main():
-    t1, t2 = rand_triangulation(6)
-    show_triangulations(t1, t2, "", 0)
+    verify(12, 10, "source", "bfs")
 
 
 if __name__ == "__main__":

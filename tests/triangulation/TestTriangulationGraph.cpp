@@ -75,3 +75,13 @@ TEST(TestTriangulationGraph, TestToTree) {
     ASSERT_EQ(nullptr, v->left->left->left->right);
     ASSERT_EQ(nullptr, v->left->left->left->left);
 }
+
+TEST(TestTriangulationGraph, TestSplit) {
+    TriangulatedGraph g(6);
+    makeGraph(g);
+    g.flip(0, 4);
+    TriangulatedGraph 
+        sub1 = g.subGraph(0, 3),
+        sub2 = g.subGraph(3, 0);
+    ASSERT_TRUE(sub1 == sub2);
+}

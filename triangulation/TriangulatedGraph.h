@@ -83,7 +83,7 @@ public:
 
     std::vector<std::vector<Edge>> getSources() const;
 
-    inline std::vector<Edge> filterAndMapEdges(int start, int end, const std::vector<Edge> &edges = getEdges()) const;
+    std::vector<Edge> filterAndMapEdges(int start, int end, const std::vector<Edge> &edges) const;
     
     TriangulatedGraph subGraph(int start, int end) const;
 };

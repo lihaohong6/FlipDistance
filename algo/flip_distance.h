@@ -24,21 +24,18 @@ public:
     virtual bool flipDistanceDecision(unsigned int k) {
         return false;
     };
-
-    virtual unsigned int flipDistance() {
-        if (start == end) {
-            return 0;
-        }
-        size_t min = 1, max = start.getSize() * 2 - 6;
-        while (min < max) {
-            size_t mid = (min + max) / 2;
-            if (flipDistanceDecision(mid)) {
-                max = mid;
-            } else {
-                min = mid + 1;
+    
+    unsigned int flipDistance(unsigned int min, unsigned int max) {
+        for (auto i = min; i <= max; ++i) {
+            if (flipDistanceDecision(i)) {
+                return i;
             }
         }
-        return min;
+        assert(false);
+    }
+
+    virtual unsigned int flipDistance() {
+        return flipDistance(0, start.getSize() * 2 - 6);
     }
     
     virtual std::vector<int> getStatistics() {

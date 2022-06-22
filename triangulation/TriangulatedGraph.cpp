@@ -319,6 +319,38 @@ Vertex *TriangulatedGraph::toBinaryTree() const {
     return buildVertex(triangulationGraphToTreeString(*this));
 }
 
+TriangulatedGraph TriangulatedGraph::subGraph(int start, int end) const {
+    int newSize = start <= end ? end - start + 1 : (int)size - (end - start + 1) + 2;
+    TriangulatedGraph result(newSize);
+    std::vector<Edge> edges = filterAndMapEdges(start, end, getEdges());
+    for (Edge e : edges) {
+        result.addEdge(e);
+    }
+    return result;
+}
+
+std::vector<Edge> TriangulatedGraph::filterAndMapEdges(int start, int end, const std::vector<Edge> &edges) const{
+    std::vector<Edge> result;
+    auto predicate = [&](int e) -> bool {
+        if (start <= end) {
+            return start <= e <= end;
+        }
+        return start <= e || e <= end;
+    };
+    auto mapper = [&](int v) -> int {
+        if (start <= end) {
+            return v - start;
+        }
+        return v >= start ? v - start : v + (int)size - start;
+    };
+    for (Edge e : edges) {
+        if (!isSimpleEdge(e) && predicate(e.first) && predicate(e.second)) {
+            result.emplace_back(mapper(e.first), mapper(e.second));
+        }
+    }
+    return result;
+}
+
 bool Node::removeEdge(const int a, const int b) {
     int other = a == this->id ? b : (b == this->id ? a : -1);
     if (other == -1) {

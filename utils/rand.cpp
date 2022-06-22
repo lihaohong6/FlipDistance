@@ -13,7 +13,7 @@ bool randBool() {
     return (bool) dist(mt);
 }
 
-inline std::vector<bool> randBits(int n) {
+std::vector<bool> randBits(int n) {
     std::vector<bool> result;
     int totalTrue = 0;
     int currTrue = 0;

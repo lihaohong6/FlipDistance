@@ -62,24 +62,6 @@ public:
             g.flip(res);
         }
     }
-    
-    bool splitAndSearch(const TriangulatedGraph &g, Edge &divider, int k, const std::vector<Edge> &sources) {
-        int v1 = divider.first, v2 = divider.second;
-        TriangulatedGraph s1 = g.subGraph(v1, v2), e1 = end.subGraph(v1, v2);
-        auto sources1 = g.filterAndMapEdges(v1, v2, sources);
-        TriangulatedGraph s2 = g.subGraph(v2, v1), e2 = end.subGraph(v2, v1);
-        auto sources2 = g.filterAndMapEdges(v2, v1, sources);
-        if (s1.getSize() > s2.getSize()) {
-            std::swap(s1, s2);
-            std::swap(e1, e2);
-            std::swap(sources1, sources2);
-        }
-        FlipDistanceSource algo(s1, e1);
-        for (int i = 0; i < k; ++i) {
-            // FIXME: put source1 in here
-            algo.flipDistanceDecision(i);
-        }
-    }
 
     bool search(const std::vector<Edge> &sources, TriangulatedGraph g, int k) {
         branchCounter++;
@@ -129,16 +111,12 @@ public:
         }
         return false;
     }
-    
-    bool flipDistanceDecision(unsigned int k, const std::vector<Edge> &source) {
-        return search(source, start, (int) k);
-    }
 
     bool flipDistanceDecision(unsigned int k) override {
         branchCounter = 0;
         std::vector<std::vector<Edge>> sources = start.getSources();
         for (auto &source: sources) {
-            if (flipDistanceDecision(k, source)) {
+            if (search(source, start, (int) k)) {
                 return true;
             }
         }

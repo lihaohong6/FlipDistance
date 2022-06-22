@@ -7,7 +7,7 @@
 int main() {
     int r = 100;
     while (r--) {
-        auto p = randomTriangulation(15);
+        auto p = randomTriangulation(24);
         auto sources = p.first.getSources();
         printf("%lu\n", sources.size());
     }

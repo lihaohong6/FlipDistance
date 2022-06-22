@@ -37,7 +37,7 @@ FlipDistance* getAlgoByName(const std::string &name, TriangulatedGraph &g, Trian
     exit(1);
 }
 
-inline std::string vectorToString(const std::vector<int>& v) {
+std::string vectorToString(const std::vector<int>& v) {
     std::string res;
     for (int i : v) {
         res += std::to_string(i);

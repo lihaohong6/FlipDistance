@@ -16,10 +16,8 @@ set(main_program ${algorithms} ${tri} ${utils})
 add_executable(Playground playground.cpp ${main_program})
 add_executable(Build main.cpp ${main_program})
 target_compile_options(Build PUBLIC -O3)
-add_executable(FdBFS fd_bfs.cpp ${main_program})
-target_compile_options(FdBFS PUBLIC -O3)
 add_executable(RandomTriangulation ${tri} rand.cpp)
-# target_compile_options(RandomTriangulation PUBLIC -O2)
+target_compile_options(RandomTriangulation PUBLIC -O2)
 
 # 'lib' is the folder with Google Test sources
 add_subdirectory(googletest)

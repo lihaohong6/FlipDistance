@@ -42,6 +42,9 @@ public:
     explicit TriangulatedGraph(const std::vector<bool> &bits);
 
     void addEdge(int a, int b);
+    void addEdge(Edge e) {
+        addEdge(e.first, e.second);
+    }
 
     bool hasEdge(int a, int b) const;
 
@@ -80,6 +83,9 @@ public:
 
     std::vector<std::vector<Edge>> getSources() const;
 
+    inline std::vector<Edge> filterAndMapEdges(int start, int end, const std::vector<Edge> &edges = getEdges()) const;
+    
+    TriangulatedGraph subGraph(int start, int end) const;
 };
 
 #endif //FLIPDISTANCE_TRIANGULATEDGRAPH_H

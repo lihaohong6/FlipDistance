@@ -5,7 +5,6 @@
 #include "TriangulatedGraph.h"
 #include "Helper.h"
 #include "BinaryTree.h"
-#include "../utils/helper.h"
 #include "../config.h"
 #include <cassert>
 #include <unordered_set>

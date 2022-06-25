@@ -1,10 +1,6 @@
 #include <iostream>
 #include "triangulation/TriangulatedGraph.h"
-#include "algo/flip_distance_middle.h"
 #include "algo/flip_distance_bfs.h"
-#include "algo/flip_distance_fast.h"
-#include "algo/flip_distance_dfs.h"
-#include "algo/flip_distance_simple.h"
 #include "algo/flip_distance_source.h"
 #include "triangulation/Helper.h"
 #include <unordered_map>
@@ -24,10 +20,6 @@ void printTriangulation(const TriangulatedGraph &g) {
 
 FlipDistance* getAlgoByName(const std::string &name, TriangulatedGraph &g, TriangulatedGraph &g2) {
     if (name == "bfs") return new FlipDistanceBfs(g, g2);
-    if (name == "dfs") return new FlipDistanceDfs(g, g2);
-    if (name == "middle") return new FlipDistanceMiddle(g, g2);
-    if (name == "simple") return new FlipDistanceSimple(g, g2);
-    if (name == "fast") return new FlipDistanceFast(g, g2);
     if (name == "source") return new FlipDistanceSource(g, g2);
     printf("No algorithm named %s found.", name.c_str());
     exit(1);

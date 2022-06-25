@@ -3,12 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "../../algo/flip_distance_fast.h"
-#include "../../algo/flip_distance_original.h"
-#include "../../algo/flip_distance_simple.h"
-#include "../../algo/flip_distance_middle.h"
 #include "../../algo/flip_distance_bfs.h"
-#include "../../algo/flip_distance_dfs.h"
 #include "../../algo/flip_distance_source.h"
 #include "../../triangulation/Helper.h"
 

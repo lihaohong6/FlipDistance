@@ -3,7 +3,6 @@
 //
 
 #include "BinaryString.h"
-#include "../utils/helper.h"
 
 BinaryString::BinaryString(const std::string &s) {
     this->size = s.size();

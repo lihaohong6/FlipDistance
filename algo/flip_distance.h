@@ -6,6 +6,7 @@
 #define FLIPDISTANCE_FLIP_DISTANCE_H
 
 #include "../triangulation/TriangulatedGraph.h"
+#include <cassert>
 
 struct Action {
     const int type;

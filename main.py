@@ -40,13 +40,13 @@ def rand_triangulation(n: int) -> tuple[Triangulation, Triangulation]:
     return convert_triangulation(t1.strip()), convert_triangulation(t2.strip())
 
 
-def run_program(t1: str, t2: str, algo_name: str = "dfs") -> tuple[int, float, int]:
+def run_program(t1: str, t2: str, algo_name: str = "bfs") -> tuple[int, float, int]:
     res: str = subprocess.check_output([f"cmake-build-debug/Build", t1, t2, algo_name], text=True)
     flip_distance, time_usage, memory_usage, *rest = res.split("\n")
     return int(flip_distance), float(time_usage), int(memory_usage)
 
 
-def run_program_decision(t1: str, t2: str, algo_name: str = "dfs") -> list[tuple[int, bool, float]]:
+def run_program_decision(t1: str, t2: str, algo_name: str = "bfs") -> list[tuple[int, bool, float]]:
     res: str = subprocess.check_output([f"cmake-build-debug/Build", t1, t2, algo_name, "1"], text=True)
     result = []
     for index, line in enumerate(res.split("\n")):
@@ -200,7 +200,13 @@ def verify(n: int, count: int, algo1: str, algo2: str):
 
 
 def main():
-    verify(14, 100, "source", "bfs")
+    while True:
+        t1, t2 = rand_triangulation(15)
+        fd, *rest = run_program(t1.tree, t2.tree, "bfs")
+        if fd < 18:
+            print(fd)
+            continue
+        print(t1.tree, t2.tree)
 
 
 if __name__ == "__main__":

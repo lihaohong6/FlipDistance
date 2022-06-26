@@ -10,12 +10,13 @@
 #include <unordered_set>
 
 TriangulatedGraph::TriangulatedGraph(size_t size) : size(size) {
+    assert(size >= 3);
     this->size = size;
     for (int i = 0; i < size; ++i) {
         vertices.emplace_back(i);
     }
     for (int i = 0; i < size; ++i) {
-        addEdge(i, (i + 1) % size);
+        addEdge(i, (i + 1) % (int)size);
     }
 }
 
@@ -45,6 +46,7 @@ TriangulatedGraph::TriangulatedGraph(const std::vector<bool> &bits)
 void TriangulatedGraph::addEdge(int a, int b) {
     assert(0 <= a && a < size);
     assert(0 <= b && b < size);
+    assert(a != b);
     vertices[a].neighbors.insert(b);
     vertices[b].neighbors.insert(a);
 }
@@ -92,15 +94,16 @@ size_t TriangulatedGraph::getSize() const {
     return size;
 }
 
-bool TriangulatedGraph::isValid() {
+bool TriangulatedGraph::isValid() const {
     size_t total = 0;
     for (const Node &v: vertices) {
         total += v.neighbors.size();
     }
-    return total / 2 == size * 2 - 3;
+    return total % 2 == 0 && total / 2 == size * 2 - 3;
 }
 
 bool TriangulatedGraph::operator==(const TriangulatedGraph &g) const {
+    assert(isValid() && g.isValid());
     if (size != g.getSize()) {
         return false;
     }
@@ -120,9 +123,11 @@ bool TriangulatedGraph::hasEdge(int a, int b) const {
     return vertices[a].neighbors.count(b);
 }
 
-std::vector<Edge> TriangulatedGraph::getNeighbors(const Edge &e, bool includeBoundary) const {
+std::vector<Edge> TriangulatedGraph::getNeighbors(const Edge &e) const {
+    assert(e.first >= 0 && e.first < size && e.second >= 0 && e.second < size);
     std::vector<Edge> edges;
     std::vector<int> neighbors = getSharedNeighbors(this, &vertices[e.first], &vertices[e.second]);
+    assert(!neighbors.empty());
     edges.emplace_back(e.first, neighbors[0]);
     edges.emplace_back(e.second, neighbors[0]);
     if (neighbors.size() > 1) {
@@ -300,7 +305,7 @@ void independentSet(std::vector<std::vector<Edge>> &accumulator,
 std::vector<std::vector<Edge>> TriangulatedGraph::getSources() const {
     using namespace std;
     Vertex *root = toBinaryTree();
-    Edge start(0, size - 1);
+    Edge start(0, (int)size - 1);
     root->e = start;
     auto neighbors = getNeighbors(start);
     assert(neighbors.size() == 2);
@@ -327,29 +332,39 @@ TriangulatedGraph TriangulatedGraph::subGraph(int start, int end) const {
     for (Edge e: edges) {
         result.addEdge(e);
     }
+    assert(result.isValid());
     return result;
 }
 
 std::vector<Edge> TriangulatedGraph::filterAndMapEdges(int start, int end, const std::vector<Edge> &edges) const {
     std::vector<Edge> result;
-    auto predicate = [&](int e) -> bool {
-        if (start <= end) {
-            return start <= e && e <= end;
-        }
-        return start <= e || e <= end;
-    };
-    auto mapper = [&](int v) -> int {
-        if (start <= end) {
-            return v - start;
-        }
-        return v >= start ? v - start : v + (int) size - start;
-    };
+    auto predicate = getVertexFilter(start, end);
+    auto mapper = getVertexMapper(start, end);
     for (Edge e: edges) {
         if (!isSimpleEdge(e) && predicate(e.first) && predicate(e.second)) {
             result.emplace_back(mapper(e.first), mapper(e.second));
         }
     }
     return result;
+}
+
+std::function<bool(int)> TriangulatedGraph::getVertexFilter(int start, int end) {
+    return [=](int e) {
+        if (start <= end) {
+            return start <= e && e <= end;
+        }
+        return start <= e || e <= end;
+    };
+}
+
+std::function<int(int)> TriangulatedGraph::getVertexMapper(int start, int end) const {
+    int vertexCount = (int)size;
+    return [=](int v) -> int {
+        if (start <= end) {
+            return v - start;
+        }
+        return v >= start ? v - start : v + vertexCount - start;
+    };
 }
 
 bool Node::removeEdge(const int a, const int b) {

@@ -52,7 +52,7 @@ public:
         return hasEdge(e.first, e.second);
     }
 
-    std::vector<Edge> getNeighbors(const Edge &e, bool includeBoundary = false) const;
+    std::vector<Edge> getNeighbors(const Edge &e) const;
 
     bool flippable(const Edge &e);
 
@@ -70,7 +70,7 @@ public:
     
     Vertex* toBinaryTree() const;
 
-    bool isValid();
+    bool isValid() const;
 
     bool isSimpleEdge(int a, int b) const;
     bool isSimpleEdge(Edge e) const {
@@ -83,6 +83,8 @@ public:
 
     std::vector<std::vector<Edge>> getSources() const;
 
+    static std::function<bool(int)> getVertexFilter(int start, int end) ;
+    std::function<int(int)> getVertexMapper(int start, int end) const;
     std::vector<Edge> filterAndMapEdges(int start, int end, const std::vector<Edge> &edges) const;
     
     TriangulatedGraph subGraph(int start, int end) const;

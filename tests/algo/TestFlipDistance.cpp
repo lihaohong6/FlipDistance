@@ -53,6 +53,8 @@ TEST(TestFlipDistance, TestFlipDistance_withMultiplePaths) {
     g2.addEdge(1, 5);
     g2.addEdge(2, 4);
     g2.addEdge(2, 5);
+    auto sub1 = g.subGraph(0, 5), sub2 = g2.subGraph(0, 5);
+    assertFd(sub1, sub2, 4, 5);
     assertFd(g, g2, 5, 6);
     g.flip(0, 3);
     assertFd(g, g2, 4, 6);

@@ -200,7 +200,7 @@ def verify(n: int, count: int, algo1: str, algo2: str):
 
 
 def main():
-    verify(12, 100, "source", "bfs")
+    verify(14, 100, "source", "bfs")
 
 
 if __name__ == "__main__":

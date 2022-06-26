@@ -26,6 +26,10 @@ struct Edge {
     friend bool operator==(const Edge &e1, const Edge &e2) {
         return e1.first == e2.first && e1.second == e2.second;
     }
+    
+    friend bool operator!=(const Edge &e1, const Edge &e2) {
+        return !(e1 == e2);
+    }
 
     friend bool operator<(const Edge &e1, const Edge &e2) {
         return e1.sum() - e2.sum() < 0;

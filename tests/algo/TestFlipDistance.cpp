@@ -6,6 +6,7 @@
 #include "../../algo/flip_distance_bfs.h"
 #include "../../algo/flip_distance_source.h"
 #include "../../triangulation/Helper.h"
+#include "../../utils/rand.h"
 
 void assertFd(TriangulatedGraph &g1, TriangulatedGraph &g2, int distance, int max) {
     FlipDistanceSource fd(g1, g2);
@@ -106,4 +107,13 @@ void testFdStr(const std::string& s1, const std::string& s2, int expected) {
 
 TEST(TestFlipDistance, TestFlipDistance_with14gon) {
     testFdStr("(((a((a((aa)a))a))a)(a(a(aa))))(aa)", "(a(((a((a(a(((aa)a)a)))a))a)(aa)))a", 15);
+}
+
+TEST(TestFlipDistance, TestFlipDistance_withRandomized10gon) {
+    for (int i = 0; i < 10; ++i) {
+        auto pair = randomTriangulation(10);
+        FlipDistanceBfs oracle(pair.first, pair.second);
+        int fd = (int)oracle.flipDistance();
+        assertFd(pair.first, pair.second, fd, fd + 2);
+    }
 }

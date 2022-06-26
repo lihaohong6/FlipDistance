@@ -63,6 +63,7 @@ int main(int argc, char **argv) {
         for (size_t i = start; i <= end; ++i) {
             // i = g.getSize() * 1.5;
             clock_t startTime = clock();
+            branchCounter = 0;
             printf("%d ", m->flipDistanceDecision(i));
             clock_t endTime = clock();
             printf("%.2f %s\n", 

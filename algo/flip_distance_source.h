@@ -21,9 +21,9 @@ namespace std {
 
 }
 
+int branchCounter = 0;
+
 class FlipDistanceSource : public FlipDistance {
-private:
-    int branchCounter = 0;
 
 public:
 
@@ -176,6 +176,7 @@ public:
 
     bool search(const std::vector<Edge> &sources, TriangulatedGraph g,
                 int k) { // keep as int; possible overflow for unsigned int
+        branchCounter++;
         // sanity check
         for (const Edge &e: g.getEdges()) {
             Edge result = g.flip(e);

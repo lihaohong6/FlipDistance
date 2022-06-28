@@ -210,7 +210,7 @@ def find_large_fd():
 
 
 def main():
-    verify(12, 10, "bfs", "source")
+    verify(12, 10, "source-fast", "source")
 
 
 if __name__ == "__main__":

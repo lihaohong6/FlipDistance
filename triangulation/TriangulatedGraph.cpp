@@ -103,7 +103,6 @@ bool TriangulatedGraph::isValid() const {
 }
 
 bool TriangulatedGraph::operator==(const TriangulatedGraph &g) const {
-    assert(isValid() && g.isValid());
     if (size != g.getSize()) {
         return false;
     }

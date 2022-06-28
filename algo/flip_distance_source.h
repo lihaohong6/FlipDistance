@@ -45,4 +45,6 @@ public:
     std::vector<int> getStatistics() override;
 };
 
+void resetBranchCounter();
+
 #endif //FLIPDISTANCE_FLIP_DISTANCE_SOURCE_H

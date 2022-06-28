@@ -170,11 +170,10 @@ bool FlipDistanceSource::search(const std::vector<Edge> &sources, TriangulatedGr
     // sanity check
     assert(assertNonTrivial(g, end));
     assert(isIndependentSet(sources, g));
-
     if (g == end && k >= 0) {
         return true;
     }
-    if (g.getSize() - 3 > k) {
+    if (g.getSize() - 3 > k - sources.size()) {
         return false;
     }
     if (sources.empty()) {
@@ -273,4 +272,8 @@ bool FlipDistanceSource::splitAndSearch(const TriangulatedGraph &g,
 
 std::vector<int> FlipDistanceSource::getStatistics() {
     return {branchCounter};
+}
+
+void resetBranchCounter() {
+    branchCounter = 0;
 }

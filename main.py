@@ -199,7 +199,7 @@ def verify(n: int, count: int, algo1: str, algo2: str):
             break
 
 
-def main():
+def find_large_fd():
     while True:
         t1, t2 = rand_triangulation(15)
         fd, *rest = run_program(t1.tree, t2.tree, "bfs")
@@ -207,6 +207,10 @@ def main():
             print(fd)
             continue
         print(t1.tree, t2.tree)
+
+
+def main():
+    verify(12, 10, "bfs", "source")
 
 
 if __name__ == "__main__":

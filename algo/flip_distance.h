@@ -8,13 +8,6 @@
 #include "../triangulation/TriangulatedGraph.h"
 #include <cassert>
 
-struct Action {
-    const int type;
-    const Edge edge;
-
-    Action(int type, Edge edgeStart) : type(type), edge(std::move(edgeStart)) {}
-};
-
 class FlipDistance {
 protected:
     const TriangulatedGraph start;

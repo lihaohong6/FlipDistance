@@ -87,11 +87,11 @@ bool FlipDistanceSource::flipDistanceDecision(unsigned int k) {
     TriangulatedGraph g = start;
     for (Edge e: g.getEdges()) {
         if (end.hasEdge(e)) {
-            return splitAndSearch(g, e, (int) k, {});
+            return splitAndSearch(g, e, (int) k);
         }
         Edge result = g.flip(e);
         if (end.hasEdge(result)) {
-            bool ret = splitAndSearch(g, result, (int) k - 1, {});
+            bool ret = splitAndSearch(g, result, (int) k - 1);
             g.flip(result);
             return ret;
         }
@@ -99,7 +99,7 @@ bool FlipDistanceSource::flipDistanceDecision(unsigned int k) {
     }
     std::vector<std::vector<Edge>> sources = start.getSources();
     for (const auto &source: sources) {
-        if (flipDistanceDecision(k, source)) {
+        if (search(source, g, (int)k)) {
             return true;
         }
     }
@@ -173,21 +173,11 @@ bool FlipDistanceSource::search(const std::vector<Edge> &sources, TriangulatedGr
     if (g == end && k >= 0) {
         return true;
     }
-    if (g.getSize() - 3 > k - sources.size()) {
+    if ((int)g.getSize() - 3 > k - (int)sources.size()) {
         return false;
     }
     if (sources.empty()) {
         return false;
-    }
-    for (const Edge &e: g.getEdges()) {
-        Edge result = g.flip(e);
-        if (end.hasEdge(result)) {
-            bool ret = std::count(sources.begin(), sources.end(), e) > 0 &&
-                       splitAndSearch(g, result, k - 1, sources);
-            g.flip(result);
-            return ret;
-        }
-        g.flip(result);
     }
     std::vector<std::pair<Edge, Edge>> next;
     for (const Edge &e: sources) {
@@ -197,9 +187,6 @@ bool FlipDistanceSource::search(const std::vector<Edge> &sources, TriangulatedGr
     }
     k -= (int) sources.size();
     auto result = performFreeFlips({g, end}, next, k);
-    if (k < 0) {
-        return false;
-    }
     for (const auto &pair: result) {
         FlipDistanceSource algo(pair.first.first, pair.first.second);
         auto source = pair.second;
@@ -249,16 +236,13 @@ bool FlipDistanceSource::search(const std::vector<std::pair<Edge, Edge>> &source
 }
 
 bool FlipDistanceSource::splitAndSearch(const TriangulatedGraph &g,
-                                        Edge &divider, int k,
-                                        const std::vector<Edge> &sources) {
+                                        Edge &divider, int k) {
     if (k <= 0) {
         return g == end && k == 0;
     }
     int v1 = divider.first, v2 = divider.second;
     TriangulatedGraph s1 = g.subGraph(v1, v2), e1 = end.subGraph(v1, v2);
-    auto sources1 = g.filterAndMapEdges(v1, v2, sources);
     TriangulatedGraph s2 = g.subGraph(v2, v1), e2 = end.subGraph(v2, v1);
-    auto sources2 = g.filterAndMapEdges(v2, v1, sources);
     FlipDistanceSource algo(s1, e1);
     for (auto i = s1.getSize() - 3; i <= k; ++i) {
         // FIXME: use sources1 and sources2

@@ -25,20 +25,13 @@ public:
     FlipDistanceSource(TriangulatedGraph start, TriangulatedGraph end)
             : FlipDistance(std::move(start), std::move(end)) {}
 
-    bool splitAndSearch(const TriangulatedGraph &g, Edge &divider,
-                        int k, // keep as int; possible overflow for unsigned int
-                        const std::vector<Edge> &sources);
+    bool splitAndSearch(const TriangulatedGraph &g, Edge &divider, int k);
 
     bool search(const std::vector<std::pair<Edge, Edge>> &sources, TriangulatedGraph g,
                 int k);
     
     bool search(const std::vector<Edge> &sources, TriangulatedGraph g,
                 int k);
-
-    bool flipDistanceDecision(unsigned int k, const std::vector<Edge> &source) {
-        TriangulatedGraph g = start;
-        return search(source, g, (int) k);
-    }
 
     bool flipDistanceDecision(unsigned int k) override;
 

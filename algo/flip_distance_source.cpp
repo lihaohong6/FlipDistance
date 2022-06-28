@@ -3,119 +3,13 @@
 //
 
 #include "flip_distance_source.h"
+#include "flip_distance_utils.h"
 #include <stack>
 #include <algorithm>
 #include <queue>
 #include <unordered_set>
 
 int branchCounter = 0;
-
-inline void addNeighbors(std::vector<std::pair<Edge, Edge>> &next,
-                         const TriangulatedGraph &g, const Edge &e) {
-    auto neighbors = g.getNeighbors(e);
-    next.emplace_back(neighbors[0], neighbors[1]);
-    next.emplace_back(neighbors[2], neighbors[3]);
-}
-
-void addNeighborsToForbid(const Edge &e, const TriangulatedGraph &g,
-                          std::unordered_multiset<Edge> &forbid) {
-    forbid.insert(e);
-    for (const Edge &neighbor: g.getNeighbors(e)) {
-        forbid.insert(neighbor);
-    }
-}
-
-template<class T>
-inline void eraseOne(std::unordered_multiset<T> &set, const T &e) {
-    auto find = set.find(e);
-    if (find != set.end()) {
-        set.erase(find);
-    }
-}
-
-void removeNeighborsFromForbid(const Edge &e, const TriangulatedGraph &g,
-                               std::unordered_multiset<Edge> &forbid) {
-    eraseOne(forbid, e);
-    for (const Edge &neighbor: g.getNeighbors(e)) {
-        eraseOne(forbid, neighbor);
-    }
-}
-
-std::vector<std::pair<Edge, Edge>>
-filterAndMapEdgePairs(const std::vector<std::pair<Edge, Edge>> &sources,
-                      const std::function<bool(int)> &filter,
-                      const std::function<int(int)> &mapper) {
-    std::vector<std::pair<Edge, Edge>> result;
-    for (auto pair: sources) {
-        if (filter(pair.first.first) && filter(pair.first.second)
-            && filter(pair.second.first) && filter(pair.second.second)) {
-            result.emplace_back(
-                    std::pair(Edge(mapper(pair.first.first), mapper(pair.first.second)),
-                              Edge(mapper(pair.second.first), mapper(pair.second.second))
-                    ));
-        }
-    }
-    return result;
-}
-
-bool assertNoCommonEdge(const TriangulatedGraph &start, const TriangulatedGraph &end) {
-    for (const Edge &e: start.getEdges()) {
-        assert(!end.hasEdge(e));
-    }
-    return true;
-}
-
-bool assertNoFreeEdge(const TriangulatedGraph &start, const TriangulatedGraph &end) {
-    TriangulatedGraph g = start;
-    for (const Edge &e: g.getEdges()) {
-        Edge result = g.flip(e);
-        g.flip(result);
-        assert(!end.hasEdge(result));
-    }
-    return true;
-}
-
-bool assertNonTrivial(const TriangulatedGraph &start, const TriangulatedGraph &end) {
-    return assertNoCommonEdge(start, end) &&
-           assertNoFreeEdge(start, end);
-}
-
-bool FlipDistanceSource::flipDistanceDecision(unsigned int k) {
-    if (start == end) {
-        return true;
-    }
-    TriangulatedGraph g = start;
-    for (Edge e: g.getEdges()) {
-        if (end.hasEdge(e)) {
-            return splitAndSearch(g, e, (int) k);
-        }
-        Edge result = g.flip(e);
-        if (end.hasEdge(result)) {
-            bool ret = splitAndSearch(g, result, (int) k - 1);
-            g.flip(result);
-            return ret;
-        }
-        g.flip(result);
-    }
-    std::vector<std::vector<Edge>> sources = start.getSources();
-    for (const auto &source: sources) {
-        if (search(source, g, (int)k)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool isIndependentSet(const std::vector<Edge> &sources, const TriangulatedGraph &g) {
-    for (const Edge &e: sources) {
-        for (const Edge &e2: sources) {
-            if (e != e2 && g.shareTriangle(e, e2)) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
 
 typedef std::pair<TriangulatedGraph, TriangulatedGraph> TriangulationPair;
 typedef std::vector<std::pair<Edge, Edge>> EdgePairs;
@@ -249,6 +143,32 @@ bool FlipDistanceSource::splitAndSearch(const TriangulatedGraph &g,
         if (algo.flipDistanceDecision(i)) {
             FlipDistanceSource algo2(s2, e2);
             return algo2.flipDistanceDecision(k - i);
+        }
+    }
+    return false;
+}
+
+bool FlipDistanceSource::flipDistanceDecision(unsigned int k) {
+    if (start == end) {
+        return true;
+    }
+    TriangulatedGraph g = start;
+    for (Edge e: g.getEdges()) {
+        if (end.hasEdge(e)) {
+            return splitAndSearch(g, e, (int) k);
+        }
+        Edge result = g.flip(e);
+        if (end.hasEdge(result)) {
+            bool ret = splitAndSearch(g, result, (int) k - 1);
+            g.flip(result);
+            return ret;
+        }
+        g.flip(result);
+    }
+    std::vector<std::vector<Edge>> sources = start.getSources();
+    for (const auto &source: sources) {
+        if (search(source, g, (int)k)) {
+            return true;
         }
     }
     return false;

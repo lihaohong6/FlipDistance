@@ -18,7 +18,7 @@ bool FlipDistanceSourceFast::search(const std::vector<Edge> &sources, Triangulat
     if (g == end && k >= 0) {
         return true;
     }
-    if (g.getSize() - 3 > k) {
+    if ((int)g.getSize() - 3 > k - (int)sources.size()) {
         return false;
     }
     if (sources.empty()) {

@@ -4,12 +4,11 @@
 
 #include "flip_distance_source.h"
 #include "flip_distance_utils.h"
+#include "statistics.h"
 #include <stack>
 #include <algorithm>
 #include <queue>
 #include <unordered_set>
-
-int branchCounter = 0;
 
 typedef std::pair<TriangulatedGraph, TriangulatedGraph> TriangulationPair;
 typedef std::vector<std::pair<Edge, Edge>> EdgePairs;
@@ -100,6 +99,7 @@ bool FlipDistanceSource::search(const std::vector<Edge> &sources, TriangulatedGr
 
 bool FlipDistanceSource::search(const std::vector<std::pair<Edge, Edge>> &sources, TriangulatedGraph g,
                                 int k) { // keep as int; possible overflow for unsigned int
+    branchCounter2++;
     // sanity check
     assert(assertNonTrivial(g, end));
     std::vector<Edge> cur;
@@ -174,10 +174,6 @@ bool FlipDistanceSource::flipDistanceDecision(unsigned int k) {
     return false;
 }
 
-std::vector<int> FlipDistanceSource::getStatistics() {
-    return {branchCounter};
-}
-
-void resetBranchCounter() {
-    branchCounter = 0;
+std::vector<int64_t> FlipDistanceSource::getStatistics() {
+    return {branchCounter, };
 }

@@ -32,7 +32,7 @@ public:
         return flipDistance(0, start.getSize() * 2 - 6);
     }
     
-    virtual std::vector<int> getStatistics() {
+    virtual std::vector<int64_t> getStatistics() {
         return {};
     }
 };

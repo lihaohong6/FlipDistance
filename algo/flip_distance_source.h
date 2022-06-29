@@ -35,9 +35,7 @@ public:
 
     bool flipDistanceDecision(unsigned int k) override;
 
-    std::vector<int> getStatistics() override;
+    std::vector<int64_t> getStatistics() override;
 };
-
-void resetBranchCounter();
 
 #endif //FLIPDISTANCE_FLIP_DISTANCE_SOURCE_H

@@ -4,7 +4,7 @@
 
 #include "flip_distance_source_fast.h"
 #include "flip_distance_utils.h"
-#include <stack>
+#include "statistics.h"
 #include <algorithm>
 #include <queue>
 #include <unordered_set>
@@ -36,6 +36,7 @@ bool FlipDistanceSourceFast::search(const std::vector<Edge> &sources, Triangulat
 
 bool FlipDistanceSourceFast::search(const std::vector<std::pair<Edge, Edge>> &sources, TriangulatedGraph g,
                                          int k) { // keep as int; possible overflow for unsigned int
+    branchCounter++;
     // sanity check
     assert(assertNoCommonEdge(g, end));
     for (const Edge &e: g.getEdges()) {

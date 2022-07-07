@@ -14,7 +14,7 @@ typedef std::pair<TriangulatedGraph, TriangulatedGraph> TriangulationPair;
 typedef std::vector<std::pair<Edge, Edge>> EdgePairs;
 typedef std::pair<TriangulationPair, EdgePairs> FDProblem;
 
-std::vector<FDProblem>
+inline std::vector<FDProblem>
 performFreeFlips(const TriangulationPair &initialPair,
                  const EdgePairs &initialSource,
                  int &k) {
@@ -90,7 +90,7 @@ bool FlipDistanceSource::search(const std::vector<Edge> &sources, TriangulatedGr
                 break;
             }
         }
-        if (i == k + 1) {
+        if (i == k + 1 || k < 0) {
             return false;
         }
     }

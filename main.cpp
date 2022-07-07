@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <ctime>
 #include <cstring>
-#include <cassert>
+#include <cmath>
 #include <cstdio>
 #include <algorithm>
 
@@ -17,7 +17,7 @@ using namespace std;
 // placeholder in case this is not enough
 typedef int64_t BigInt;
 
-BigInt pow(int base, int exp) {
+BigInt intPow(int base, int exp) {
     BigInt ans = 1;
     while (exp--) {
         ans *= base;
@@ -85,9 +85,9 @@ int main(int argc, char **argv) {
             auto statistics = m->getStatistics();
             auto n = g.getSize() - 3;
             statistics.push_back((long long)(
-                    pow(1.618L, n) *
+                    pow(1.618L, n + 1) *
                     pow(9.0L, std::max(0, (int) (i - n)))));
-            statistics.push_back(pow(4, (int)i));
+            statistics.push_back(intPow(4, (int) i));
             printf("%.3f %s\n",
                    (double) (endTime - startTime) / CLOCKS_PER_SEC,
                    vectorToString(statistics).c_str());

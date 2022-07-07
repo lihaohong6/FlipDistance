@@ -20,6 +20,7 @@ add_executable(Playground playground.cpp ${main_program} ${rand_utils})
 add_executable(Build main.cpp ${main_program})
 target_compile_options(Build PUBLIC -O3)
 add_executable(Debug main.cpp ${main_program})
+target_compile_options(Debug PUBLIC -g)
 add_executable(RandomTriangulation ${tri} ${rand_utils} rand.cpp)
 target_compile_options(RandomTriangulation PUBLIC -O2)
 

@@ -99,5 +99,6 @@ int main(int argc, char **argv) {
         printf("%.2f\n", (double) (endTime - startTime) / CLOCKS_PER_SEC);
         printf("0\n");
     }
+    delete m;
     return 0;
 }

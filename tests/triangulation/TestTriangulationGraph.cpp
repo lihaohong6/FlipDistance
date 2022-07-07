@@ -74,6 +74,7 @@ TEST(TestTriangulationGraph, TestToTree) {
     ASSERT_EQ(nullptr, v->left->left->right);
     ASSERT_EQ(nullptr, v->left->left->left->right);
     ASSERT_EQ(nullptr, v->left->left->left->left);
+    delete v;
 }
 
 TEST(TestTriangulationGraph, TestSplit) {

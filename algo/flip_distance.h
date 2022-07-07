@@ -15,6 +15,11 @@ protected:
 public:
     FlipDistance(TriangulatedGraph start, TriangulatedGraph end) : start(std::move(start)), end(std::move(end)) {}
     
+    bool isTrivial() {
+        // TODO: finish this
+        return start == end;
+    }
+    
     virtual bool flipDistanceDecision(unsigned int k) {
         return false;
     };

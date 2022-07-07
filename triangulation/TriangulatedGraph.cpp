@@ -302,7 +302,6 @@ void independentSet(std::vector<std::vector<Edge>> &accumulator,
 }
 
 std::vector<std::vector<Edge>> TriangulatedGraph::getSources() const {
-    using namespace std;
     Vertex *root = toBinaryTree();
     Edge start(0, (int)size - 1);
     root->e = start;
@@ -312,11 +311,12 @@ std::vector<std::vector<Edge>> TriangulatedGraph::getSources() const {
     sortEdge(left, right);
     assignEdge(*this, root->left, left, root);
     assignEdge(*this, root->right, right, root);
-    vector<vector<Edge>> accumulator;
+    std::vector<std::vector<Edge>> accumulator;
     int totalNodes = this->size - 2;
     std::vector<Vertex *> list = preOrder(root);
     std::vector<bool> selection(totalNodes);
     independentSet(accumulator, list, selection, 1);
+    delete root;
     return accumulator;
 }
 

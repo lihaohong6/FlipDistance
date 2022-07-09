@@ -5,7 +5,6 @@
 #include "gtest/gtest.h"
 #include "../../algo/flip_distance_bfs.h"
 #include "../../algo/flip_distance_source.h"
-#include "../../algo/flip_distance_source_fast.h"
 #include "../../triangulation/Helper.h"
 #include "../../utils/rand.h"
 

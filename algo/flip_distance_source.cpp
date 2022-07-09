@@ -5,64 +5,16 @@
 #include "flip_distance_source.h"
 #include "flip_distance_utils.h"
 #include "statistics.h"
-#include <stack>
 #include <algorithm>
 #include <queue>
 #include <unordered_set>
 
-typedef std::pair<TriangulatedGraph, TriangulatedGraph> TriangulationPair;
-typedef std::vector<std::pair<Edge, Edge>> EdgePairs;
-typedef std::pair<TriangulationPair, EdgePairs> FDProblem;
-
-inline std::vector<FDProblem>
-performFreeFlips(const TriangulationPair &initialPair,
-                 const EdgePairs &initialSource,
-                 int &k) {
-    std::stack<FDProblem> cur;
-    std::vector<FDProblem> noFree;
-    cur.push({initialPair, initialSource});
-    while (!cur.empty()) {
-        auto fd = cur.top();
-        cur.pop();
-        auto g1 = fd.first.first, g2 = fd.first.second;
-        bool noFreeEdge = true;
-        for (const Edge &e: g1.getEdges()) {
-            Edge result = g1.flip(e);
-            if (g2.hasEdge(result)) {
-                noFreeEdge = false;
-                k--;
-                EdgePairs next = fd.second;
-                next.erase(std::remove_if(next.begin(), next.end(), [=](auto pair) {
-                    return pair.first == e || pair.second == e;
-                }), next.end());
-                addNeighbors(next, g1, result);
-                int v1 = result.first, v2 = result.second;
-                cur.push({{g1.subGraph(v1, v2), g2.subGraph(v1, v2)},
-                          filterAndMapEdgePairs(next,
-                                                TriangulatedGraph::getVertexFilter(v1, v2),
-                                                g1.getVertexMapper(v1, v2))});
-                cur.push({{g1.subGraph(v2, v1), g2.subGraph(v2, v1)},
-                          filterAndMapEdgePairs(next,
-                                                TriangulatedGraph::getVertexFilter(v2, v1),
-                                                g1.getVertexMapper(v2, v1))});
-                break;
-
-            }
-            g1.flip(result);
-        }
-        if (noFreeEdge) {
-            noFree.push_back(fd);
-        }
-    }
-    return noFree;
-}
-
 bool FlipDistanceSource::search(const std::vector<Edge> &sources, TriangulatedGraph g,
-                                int k) { // keep as int; possible overflow for unsigned int
-    branchCounter++;
+                                    int k) { // keep as int; possible overflow for unsigned int
     // sanity check
     assert(assertNonTrivial(g, end));
     assert(isIndependentSet(sources, g));
+
     if (g == end && k >= 0) {
         return true;
     }
@@ -79,29 +31,44 @@ bool FlipDistanceSource::search(const std::vector<Edge> &sources, TriangulatedGr
         addNeighbors(next, g, result);
     }
     k -= (int) sources.size();
-    auto result = performFreeFlips({g, end}, next, k);
-    for (const auto &pair: result) {
-        FlipDistanceSource algo(pair.first.first, pair.first.second);
-        auto source = pair.second;
-        int i = 0;
-        for (; i <= k; ++i) {
-            if (algo.search(source, algo.start, i)) {
-                k -= i;
-                break;
-            }
-        }
-        if (i == k + 1 || k < 0) {
-            return false;
-        }
-    }
-    return k >= 0;
+    return search(next, g, k);
 }
 
 bool FlipDistanceSource::search(const std::vector<std::pair<Edge, Edge>> &sources, TriangulatedGraph g,
-                                int k) { // keep as int; possible overflow for unsigned int
-    branchCounter2++;
+                                    int k) { // keep as int; possible overflow for unsigned int
+    branchCounter++;
     // sanity check
-    assert(assertNonTrivial(g, end));
+    assert(assertNoCommonEdge(g, end));
+    for (const Edge &e: g.getEdges()) {
+        Edge result = g.flip(e);
+        if (end.hasEdge(result)) {
+            k--;
+            std::vector<std::pair<Edge, Edge>> next = sources;
+            next.erase(std::remove_if(next.begin(), next.end(), [=](auto pair) {
+                return pair.first == e || pair.second == e;
+            }), next.end());
+            addNeighbors(next, g, result);
+            int v1 = result.first, v2 = result.second;
+            TriangulatedGraph s1 = g.subGraph(v1, v2), e1 = end.subGraph(v1, v2);
+            auto sources1 = filterAndMapEdgePairs(next,
+                                                  TriangulatedGraph::getVertexFilter(v1, v2),
+                                                  g.getVertexMapper(v1, v2));
+            TriangulatedGraph s2 = g.subGraph(v2, v1), e2 = end.subGraph(v2, v1);
+            auto sources2 = filterAndMapEdgePairs(next,
+                                                  TriangulatedGraph::getVertexFilter(v2, v1),
+                                                  g.getVertexMapper(v2, v1));
+            g.flip(result);
+            FlipDistanceSource algo(s1, e1);
+            for (auto i = s1.getSize() - 3; i <= k; ++i) {
+                if (algo.search(sources1, s1, (int)i)) {
+                    FlipDistanceSource algo2(s2, e2);
+                    return algo2.search(sources2, s2, int(k - i));
+                }
+            }
+            return false;
+        }
+        g.flip(result);
+    }
     std::vector<Edge> cur;
     std::unordered_multiset<Edge> forbid;
     std::function<bool(int)> generateNext = [&](int index) -> bool {

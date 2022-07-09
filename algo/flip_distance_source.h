@@ -27,11 +27,9 @@ public:
 
     bool splitAndSearch(const TriangulatedGraph &g, Edge &divider, int k);
 
-    virtual bool search(const std::vector<std::pair<Edge, Edge>> &sources, TriangulatedGraph g,
-                int k);
-    
-    virtual bool search(const std::vector<Edge> &sources, TriangulatedGraph g,
-                int k);
+    bool search(const std::vector<std::pair<Edge, Edge>> &sources, TriangulatedGraph g, int k);
+
+    bool search(const std::vector<Edge> &sources, TriangulatedGraph g, int k);
 
     bool flipDistanceDecision(unsigned int k) override;
 

@@ -106,7 +106,6 @@ bool FlipDistanceSource::splitAndSearch(const TriangulatedGraph &g,
     TriangulatedGraph s2 = g.subGraph(v2, v1), e2 = end.subGraph(v2, v1);
     FlipDistanceSource algo(s1, e1);
     for (auto i = s1.getSize() - 3; i <= k; ++i) {
-        // FIXME: use sources1 and sources2
         if (algo.flipDistanceDecision(i)) {
             FlipDistanceSource algo2(s2, e2);
             return algo2.flipDistanceDecision(k - i);
@@ -135,6 +134,9 @@ bool FlipDistanceSource::flipDistanceDecision(unsigned int k) {
     std::vector<std::vector<Edge>> sources = start.getSources();
     for (const auto &source: sources) {
         if (search(source, g, (int)k)) {
+            if (DEBUG) {
+                printf("Initial source count: %lu\n", source.size());
+            }
             return true;
         }
     }

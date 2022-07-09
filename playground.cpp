@@ -3,10 +3,12 @@
 //
 
 #include "utils/rand.h"
+#include "algo/flip_distance_source.h"
 
 int main() {
-    auto start = clock();
-    auto p = randomTriangulation(14);
-    auto end = clock();
-    printf("%zu %f", p.first.getSize(), (double)(end-start) / CLOCKS_PER_SEC);
+    while (1) {
+        auto p = randomTriangulation(10, true);
+        FlipDistanceSource algo(p.first,p.second);
+        printf("%lu\n", algo.flipDistance());
+    }
 }

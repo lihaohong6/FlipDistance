@@ -7,6 +7,8 @@
 
 extern int branchCounter, branchCounter2;
 
+static bool DEBUG = true;
+
 void resetStatistics();
 
 #endif //FLIPDISTANCE_STATISTICS_H

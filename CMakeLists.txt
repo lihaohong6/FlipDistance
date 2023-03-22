@@ -25,6 +25,6 @@ add_subdirectory(googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 # 'Google_Tests_run' is the target name
-add_executable(Google_Tests_run ${algorithms} ${tri} 
-        tests/algo/TestFlipDistance.cpp tests/triangulation/TestTriangulationGraph.cpp)
+add_executable(Google_Tests_run ${algorithms} ${tri} ${rand_utils}
+        tests/algo/TestFlipDistance.cpp tests/triangulation/TestTriangulationGraph.cpp tests/triangulation/TestBinaryString.cpp)
 target_link_libraries(Google_Tests_run gtest gtest_main)

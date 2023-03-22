@@ -17,12 +17,10 @@ private:
     size_t size;
     std::vector<bool> bits;
 public:
-    explicit BinaryString(int size) {
-        this->size = size;
-    }
     explicit BinaryString(const std::string&);
     TriangulatedGraph toTriangulatedGraph() const;
     std::string toString();
+    std::string toDyckPath(int digitWidth = 2) const;
 
     const std::vector<bool> &getBits() const;
 };

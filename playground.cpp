@@ -2,16 +2,9 @@
 // Created by Peter Li on 6/8/22.
 //
 
-#include "utils/rand.h"
+#include "triangulation/Helper.h"
+#include <cstdio>
 
 int main() {
-    int i = *((int*)malloc(4));
-    delete &i;
-    printf("%d\n", i);
-    int r = 100;
-    while (r--) {
-        auto p = randomTriangulation(24);
-        auto sources = p.first.getSources();
-        printf("%lu\n", sources.size());
-    }
+    printf("%s", BinaryString(treeStringToParentheses("a((bc)d)")).toDyckPath().c_str());
 }

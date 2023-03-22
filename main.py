@@ -210,4 +210,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    verify(14, 10, "bfs", "source")

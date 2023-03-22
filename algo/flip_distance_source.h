@@ -29,7 +29,9 @@ public:
 
     FlipDistanceSource(TriangulatedGraph start, TriangulatedGraph end)
             : FlipDistance(std::move(start), std::move(end)) {}
-
+            
+private:
+            
     static void addNeighborsToForbid(const Edge &e, const TriangulatedGraph &g,
                                      std::unordered_multiset<Edge> &forbid) {
         forbid.insert(e);
@@ -219,6 +221,8 @@ public:
         TriangulatedGraph g = start;
         return search(source, g, (int) k);
     }
+    
+public:
 
     bool flipDistanceDecision(unsigned int k) override {
         if (start == end) {

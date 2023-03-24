@@ -37,12 +37,15 @@ TEST(TestTriangulationGraph, TestFlip) {
     g2.addEdge(2, 4);
     g.flip(0, 3);
     g.flip(0, 2);
-    ASSERT_FALSE(g == g2);
+    EXPECT_FALSE(g == g2);
     g.flip(0, 4);
     EXPECT_TRUE(g == g2);
     g2.flip(2, 4);
     EXPECT_FALSE(g == g2);
     TriangulatedGraph g3(7);
+    for (int i = 3; i < 7; ++i) {
+        g3.addEdge(1, i);
+    }
     EXPECT_FALSE(g == g3);
 }
 

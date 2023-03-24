@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(algorithms
         algo/flip_distance.h
-        algo/flip_distance_bfs.h algo/flip_distance_source.h)
+        algo/flip_distance_bfs.h algo/flip_distance_fpt.h)
 set(tri triangulation/Helper.cpp triangulation/Helper.h
         triangulation/TriangulatedGraph.cpp triangulation/TriangulatedGraph.h triangulation/BinaryString.cpp 
         triangulation/BinaryString.h triangulation/BinaryTree.h triangulation/Edge.h 

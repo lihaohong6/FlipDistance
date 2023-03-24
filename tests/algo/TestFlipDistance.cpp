@@ -4,12 +4,12 @@
 
 #include "gtest/gtest.h"
 #include "../../algo/flip_distance_bfs.h"
-#include "../../algo/flip_distance_source.h"
+#include "../../algo/flip_distance_fpt.h"
 #include "../../triangulation/Helper.h"
 #include "../../utils/rand.h"
 
 void assertFd(TriangulatedGraph &g1, TriangulatedGraph &g2, int distance, int max) {
-    FlipDistanceSource fd(g1, g2);
+    FlipDistanceFPT fd(g1, g2);
     for (int i = 1; i < distance; i++) {
         ASSERT_FALSE(fd.flipDistanceDecision(i));
     }
@@ -113,7 +113,7 @@ TEST(TestFlipDistance, TestFlipDistance_withRandom12gon) {
     int repetitions = 5;
     while(repetitions--) {
         auto pair = randomTriangulation(12, true);
-        FlipDistanceSource fd(pair.first, pair.second);
+        FlipDistanceFPT fd(pair.first, pair.second);
         FlipDistanceBfs fd2(pair.first, pair.second);
         ASSERT_EQ(fd.flipDistance(), fd2.flipDistance());
     }

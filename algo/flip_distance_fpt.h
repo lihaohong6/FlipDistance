@@ -2,8 +2,8 @@
 // Created by Peter Li on 6/4/22.
 //
 
-#ifndef FLIPDISTANCE_FLIP_DISTANCE_SOURCE_H
-#define FLIPDISTANCE_FLIP_DISTANCE_SOURCE_H
+#ifndef FLIPDISTANCE_FLIP_DISTANCE_FPT_H
+#define FLIPDISTANCE_FLIP_DISTANCE_FPT_H
 
 #include "flip_distance.h"
 #include <algorithm>
@@ -23,11 +23,11 @@ namespace std {
 
 int branchCounter = 0;
 
-class FlipDistanceSource : public FlipDistance {
+class FlipDistanceFPT : public FlipDistance {
 
 public:
 
-    FlipDistanceSource(TriangulatedGraph start, TriangulatedGraph end)
+    FlipDistanceFPT(TriangulatedGraph start, TriangulatedGraph end)
             : FlipDistance(std::move(start), std::move(end)) {}
             
 private:
@@ -67,11 +67,11 @@ private:
         auto sources1 = g.filterAndMapEdges(v1, v2, sources);
         TriangulatedGraph s2 = g.subGraph(v2, v1), e2 = end.subGraph(v2, v1);
         auto sources2 = g.filterAndMapEdges(v2, v1, sources);
-        FlipDistanceSource algo(s1, e1);
+        FlipDistanceFPT algo(s1, e1);
         for (auto i = s1.getSize() - 3; i <= k; ++i) {
             // FIXME: use sources1 and sources2
             if (algo.flipDistanceDecision(i)) {
-                FlipDistanceSource algo2(s2, e2);
+                FlipDistanceFPT algo2(s2, e2);
                 return algo2.flipDistanceDecision(k - i);
             }
         }
@@ -127,10 +127,10 @@ private:
                                                       TriangulatedGraph::getVertexFilter(v2, v1),
                                                       g.getVertexMapper(v2, v1));
                 g.flip(result);
-                FlipDistanceSource algo(s1, e1);
+                FlipDistanceFPT algo(s1, e1);
                 for (auto i = s1.getSize() - 3; i <= k; ++i) {
                     if (algo.search(sources1, s1, (int)i)) {
-                        FlipDistanceSource algo2(s2, e2);
+                        FlipDistanceFPT algo2(s2, e2);
                         return algo2.search(sources2, s2, int(k - i));
                     }
                 }
@@ -255,4 +255,4 @@ public:
     }
 };
 
-#endif //FLIPDISTANCE_FLIP_DISTANCE_SOURCE_H
+#endif //FLIPDISTANCE_FLIP_DISTANCE_FPT_H
